@@ -43,6 +43,7 @@ class DocFormatter:
         self.formatter = FormatUtils() # Non-markdown formatters will override this.
         self.layout_payloads = 'bottom' # Do payloads go at top of section or bottom?
         self.current_uris = []
+        self.ref_deduplicator = {} # Tracks use of refs within a schema to assist in combining them for output.
 
         if self.config.get('profile_mode'):
             self.config['MinVersionLT1.6'] = False
@@ -175,6 +176,13 @@ class DocFormatter:
         """Add a row (or group of rows) for an individual property in the current section/schema.
 
         formatted_row should be a chunk of text already formatted for output"""
+        raise NotImplementedError
+
+    def add_property_row_new(self, formatted_rows, ref_uri=None):
+        """Add a row (or group of rows) for an individual property in the current section/schema.
+
+        formatted_row should be a chunk of text already formatted for output
+        TODO: better docstring!"""
         raise NotImplementedError
 
     def add_property_details(self, formatted_details):
@@ -391,6 +399,7 @@ class DocFormatter:
             details = property_data[schema_ref]
             schema_name = details['schema_name']
             profile = config.get('profile_resources', {}).get(schema_ref, {})
+            self.ref_deduplicator[schema_ref] = {}
 
             # Look up supplemental details for this schema/version
             version = details.get('latest_version', '1')
@@ -490,11 +499,14 @@ class DocFormatter:
 
                     prop_infos = self.extend_property_info(schema_ref, prop_info)
 
+                    # If we've extended an in-schema reference, capture it for possible combining on output:
+                    prop_info_ref_uri = self.count_in_schema_ref(schema_ref, prop_infos[0])
+
                     formatted = self.format_property_row(schema_ref, prop_name, prop_infos, [])
                     if formatted:
                         # Skip "Actions" if requested. Everything else is output.
                         if prop_name != 'Actions' or self.config.get('actions_in_property_table', True):
-                            self.add_property_row(formatted['row'])
+                            self.add_property_row_new(formatted['row'], prop_info_ref_uri)
                         if formatted['details']:
                             prop_details.update(formatted['details'])
                         if formatted['action_details']:
@@ -786,6 +798,8 @@ class DocFormatter:
                             ref_info = idref_info
                 ref_info = self.apply_overrides(ref_info)
 
+                # Useful ident: ref_info['_ref_uri']. We need to know by now if there are duplicates.
+
                 if ref_info.get('type') == 'object':
                     # If this is an excerpt, it will also be an object, and we want to expand-in-place.
                     # The same applies (or should) if config explicitly says to include:
@@ -988,7 +1002,6 @@ class DocFormatter:
 
         else:
             prop_infos.append(prop_info)
-
         return prop_infos
 
 
@@ -1383,6 +1396,7 @@ class DocFormatter:
                     prop_item['excerptCopy'] = excerpt_copy_name
 
                 prop_items = self.extend_property_info(schema_ref, prop_item)
+                # TODO: maybe capture dups here.
                 if excerpt_copy_name:
                     excerpt_ref_uri = prop_items[0].get('_ref_uri')
                     excerpt_schema_ref = prop_items[0].get('_from_schema_ref')
@@ -1675,6 +1689,7 @@ class DocFormatter:
                                                                    prop_name in parent_requires_on_create)
                 base_detail_info = self.apply_overrides(base_detail_info, schema_name, prop_name)
                 detail_info = self.extend_property_info(schema_ref, base_detail_info)
+                prop_info_ref_uri = self.count_in_schema_ref(schema_ref, detail_info[0])
 
                 if is_action:
                     # Trim out the properties; these are always Target and Title:
@@ -1684,7 +1699,7 @@ class DocFormatter:
 
                 formatted = self.format_property_row(schema_ref, prop_name, detail_info, new_path)
                 if formatted:
-                    output.append(formatted['row'])
+                    output.append(formatted['row']) # TODO: capture prop_info_ref_uri
                     if formatted['details']:
                         details.update(formatted['details'])
                     if formatted['action_details']:
@@ -1790,6 +1805,30 @@ class DocFormatter:
                             replacement = match_spec.get('replace_with')
 
         return replacement
+
+
+    def count_in_schema_ref(self, schema_ref, prop_info):
+        """ Examine prop_info for a reference and update the count in ref_deduplicator, if appropriate.
+        Returns the _ref_uri from prop_info if so
+        """
+
+        if prop_info.get('_from_schema_ref') != schema_ref:
+            return None
+
+        ref_uri = prop_info.get('_ref_uri', None)
+        if not ref_uri:
+            return None
+
+        if schema_ref not in self.ref_deduplicator:
+            self.ref_deduplicator[schema_ref] = {}
+        dedup = self.ref_deduplicator[schema_ref]
+
+        if ref_uri in dedup:
+            dedup[ref_uri] = dedup[ref_uri] + 1
+        else:
+            dedup[ref_uri] = 1
+
+        return ref_uri
 
 
     # Override in HTML formatter to get actual links.
