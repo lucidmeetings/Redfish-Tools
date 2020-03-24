@@ -178,12 +178,12 @@ class DocFormatter:
         formatted_row should be a chunk of text already formatted for output"""
         raise NotImplementedError
 
-    def add_property_row_new(self, formatted_rows, ref_uri=None):
-        """Add a row (or group of rows) for an individual property in the current section/schema.
+    # def add_property_row_new(self, formatted_rows, ref_uri=None):
+    #     """Add a row (or group of rows) for an individual property in the current section/schema.
 
-        formatted_row should be a chunk of text already formatted for output
-        TODO: better docstring!"""
-        raise NotImplementedError
+    #     formatted_row should be a chunk of text already formatted for output
+    #     TODO: better docstring!"""
+    #     raise NotImplementedError
 
     def add_property_details(self, formatted_details):
         """Add a chunk of property details information for the current section/schema."""
@@ -488,6 +488,7 @@ class DocFormatter:
                     prop_names = self.filter_props_by_profile(prop_names, profile, required, False)
 
                 prop_names = self.organize_prop_names(prop_names)
+                prop_info_stash = {}
 
                 for prop_name in prop_names:
                     prop_info = properties[prop_name]
@@ -498,6 +499,14 @@ class DocFormatter:
                     prop_info['required_parameter'] = prop_info.get('requiredParameter')
 
                     prop_infos = self.extend_property_info(schema_ref, prop_info)
+                    # if prop_name == 'Thresholds':
+                    #     import pdb;pdb.set_trace()
+
+                    # TODO: need to extend further here, before continuing on.
+                    prop_info_stash[prop_name] = prop_infos
+
+                for prop_name in prop_names:
+                    prop_infos = prop_info_stash[prop_name]
 
                     # If we've extended an in-schema reference, capture it for possible combining on output:
                     prop_info_ref_uri = self.count_in_schema_ref(schema_ref, prop_infos[0])
@@ -506,7 +515,7 @@ class DocFormatter:
                     if formatted:
                         # Skip "Actions" if requested. Everything else is output.
                         if prop_name != 'Actions' or self.config.get('actions_in_property_table', True):
-                            self.add_property_row_new(formatted['row'], prop_info_ref_uri)
+                            self.add_property_row(formatted['row'])
                         if formatted['details']:
                             prop_details.update(formatted['details'])
                         if formatted['action_details']:

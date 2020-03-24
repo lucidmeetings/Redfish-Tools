@@ -791,12 +791,12 @@ search: true
         self.this_section['properties'].append(formatted_text)
 
 
-    def add_property_row_new(self, formatted_rows, ref_uri=None):
-        """Add a row (or group of rows) for an individual property in the current section/schema.
+    # def add_property_row_new(self, formatted_rows, ref_uri=None):
+    #     """Add a row (or group of rows) for an individual property in the current section/schema.
 
-        formatted_row should be a chunk of text already formatted for output
-        TODO: better docstring! """
-        self.this_section['properties'].append([formatted_rows, ref_uri])
+    #     formatted_row should be a chunk of text already formatted for output
+    #     TODO: better docstring! """
+    #     self.this_section['properties'].append([formatted_rows, ref_uri])
 
 
     def add_property_details(self, formatted_details):
