@@ -197,7 +197,7 @@ class DocFormatter:
 
 
     def format_property_details(self, prop_name, prop_type, prop_description, enum, enum_details,
-                                    supplemental_details, parent_prop_info, anchor=None, profile={}):
+                                    supplemental_details, parent_prop_info, profile={}):
         """Generate a formatted table of enum information for inclusion in Property Details."""
         raise NotImplementedError
 
@@ -1430,12 +1430,12 @@ class DocFormatter:
                 prop_enum_details = prop_info.get('enumLongDescriptions')
             else:
                 prop_enum_details = prop_info.get('enumDescriptions')
-            anchor = schema_ref + '|details|' + prop_name
+
             formatted_details = self.format_property_details(prop_name, prop_type, descr,
                                                                  prop_enum, prop_enum_details,
                                                                  supplemental_details,
                                                                  prop_info,
-                                                                 anchor=anchor, profile=profile)
+                                                                 profile=profile)
             prop_detail_key = prop_info.get('_ref_uri', '_inline')
             if prop_info.get('_in_items') and len(prop_path):
                 # In items, the prop_path is expected to include the prop name at this point.
@@ -1792,7 +1792,7 @@ class DocFormatter:
         return {'rows': output, 'details': details, 'action_details': action_details, 'promote_me': True}
 
 
-    def format_as_prop_details(self, prop_name, prop_description, rows, anchor=None):
+    def format_as_prop_details(self, prop_name, prop_description, rows):
         """ Take the formatted rows and other strings from prop_info, and create a formatted block suitable for the prop_details section """
         raise NotImplementedError
 

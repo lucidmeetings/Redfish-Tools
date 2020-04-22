@@ -449,7 +449,7 @@ pre.code{
 
 
     def format_property_details(self, prop_name, prop_type, prop_description, enum, enum_details,
-                                    supplemental_details, parent_prop_info, anchor=None, profile=None):
+                                    supplemental_details, parent_prop_info, profile=None):
         """Generate a formatted table of enum information for inclusion in Property details."""
 
         contents = []
@@ -1061,7 +1061,7 @@ pre.code{
             self.registry_sections.append(this_section)
 
 
-    def format_as_prop_details(self, prop_name, prop_description, rows, anchor=None):
+    def format_as_prop_details(self, prop_name, prop_description, rows):
         """ Take the formatted rows and other strings from prop_info, and create a formatted block suitable for the prop_details section """
         contents = []
 
