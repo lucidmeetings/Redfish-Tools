@@ -97,8 +97,8 @@ class DocFormatter:
         raise NotImplementedError
 
 
-    def add_section(self, text, link_id=False):
-        """ Add a top-level heading """
+    def add_section(self, text, link_id=False, schema_ref=False):
+        """ Add a container for all the information in a section """
         raise NotImplementedError
 
 
@@ -413,7 +413,7 @@ class DocFormatter:
                 section_name = schema_name
             else:
                 section_name = details['name_and_version']
-            self.add_section(section_name, schema_name)
+            self.add_section(section_name, schema_name, schema_ref)
             self.current_version = {}
 
             if profile.get('URIs'):
@@ -644,7 +644,7 @@ class DocFormatter:
                 if version:
                     ref_id += '_v' + version
 
-                cp_gen.add_section(prop_name, ref_id)
+                cp_gen.add_section(prop_name, ref_id, schema_ref)
                 cp_gen.add_json_payload(supplemental.get('jsonpayload'))
 
                 # Override with supplemental schema description, if provided
@@ -1480,10 +1480,8 @@ class DocFormatter:
                 # Format it as if it were a top-level object, and remove the rows here.
                 object_formatted = self.format_object_descr(schema_ref, prop_info, [], is_action)
                 obj_prop_name = prop_info.get('_prop_name')
-                anchor = schema_ref + '|details_combined_ref|' + obj_prop_name
                 object_as_details = self.format_as_prop_details(obj_prop_name, prop_info.get('_ref_description'),
-                                                                    object_formatted['rows'], anchor)
-                # TODO
+                                                                    object_formatted['rows'])
                 new_details = {obj_prop_name: {
                     prop_info.get('_ref_uri', '_inline'): {
                         'paths': [new_path],

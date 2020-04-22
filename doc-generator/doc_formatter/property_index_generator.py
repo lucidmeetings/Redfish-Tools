@@ -113,7 +113,7 @@ class PropertyIndexGenerator(DocFormatter):
         return output
 
 
-    def add_section(self, text, link_id=False):
+    def add_section(self, text, link_id=False, schema_ref=False):
         """ Start gathering info for this schema. """
 
         self.this_section = {

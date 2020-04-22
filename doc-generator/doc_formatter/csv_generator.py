@@ -275,7 +275,7 @@ class CsvGenerator(DocFormatter):
         return "\n".join(formatted)
 
 
-    def add_section(self, text, link_id=False):
+    def add_section(self, text, link_id=False, schema_ref=False):
         """ Rather than a top-level heading, for CSV we set the first column (schema name) """
         if ' ' in text:
             self.schema_name, self.schema_version = text.split(' ', 1)

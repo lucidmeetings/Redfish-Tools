@@ -775,7 +775,7 @@ search: true
         return '\n'.join(intro)
 
 
-    def add_section(self, text, link_id=False):
+    def add_section(self, text, link_id=False, schema_ref=False):
         """ Add a top-level heading """
         self.this_section = {'head': text,
                              'heading': '\n' + self.formatter.head_one(text, self.level),
