@@ -49,8 +49,10 @@ def test_properties_with_same_name_md(mockRequest):
 
     prop_details = docGen.generator.this_section.get('property_details', {})
     # Property details should have been collected for the following (and only these):
-    expected_prop_details = ['ResetType', 'ConnectTypesSupported', 'ManagerType', 'PowerState']
-    assert [x for x in prop_details.keys()] == expected_prop_details
+    expected_prop_details = ['ConnectTypesSupported', 'ManagerType', 'PowerState', 'ResetType']
+    found_prop_details = [x for x in prop_details.keys()]
+    found_prop_details.sort()
+    assert found_prop_details == expected_prop_details
 
     # The following number of definitions should be captured for each:
     assert len(prop_details['ResetType'].keys()) == 2
