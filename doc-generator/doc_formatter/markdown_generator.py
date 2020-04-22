@@ -313,7 +313,6 @@ class MarkdownGenerator(DocFormatter):
         """Generate a formatted table of enum information for inclusion in Property details."""
 
         contents = []
-        contents.append(self.formatter.head_three(prop_name + ':', self.level))
 
         parent_version = parent_prop_info.get('versionAdded')
         if parent_version:
@@ -587,7 +586,6 @@ class MarkdownGenerator(DocFormatter):
     def format_as_prop_details(self, prop_name, prop_description, rows, anchor=None):
         """ Take the formatted rows and other strings from prop_info, and create a formatted block suitable for the prop_details section """
         contents = []
-        contents.append(self.formatter.head_three(prop_name + ':', 0))
 
         if prop_description:
             contents.append(self.formatter.para(self.escape_for_markdown(prop_description, self.config.get('escape_chars', []))))
