@@ -1222,8 +1222,7 @@ class DocFormatter:
                 parsed['prop_is_object'] |= det['prop_is_object']
                 parsed['prop_is_array'] |= det['prop_is_array']
                 parsed['has_direct_prop_details'] |= det['has_direct_prop_details']
-                import pdb; pdb.set_trace()
-                parsed['prop_details'].update(det['prop_details'])
+                self.merge_property_details(parsed['prop_details'], det['prop_details'])
                 parsed['has_action_details'] |= det['has_action_details']
                 parsed['action_details'].update(det['action_details'])
                 parsed['profile_conditional_details'].update(det['profile_conditional_details'])
@@ -1244,6 +1243,7 @@ class DocFormatter:
         """
         traverser = self.traverser
 
+        # TODO: should this be true for any path that starts with 'Actions'?
         within_action = prop_path == ['Actions']
 
         # type may be a string or a list.
@@ -1437,10 +1437,15 @@ class DocFormatter:
                                                                  prop_info,
                                                                  anchor=anchor, profile=profile)
             prop_detail_key = prop_info.get('_ref_uri', '_inline')
+            if prop_info.get('_in_items') and len(prop_path):
+                # In items, the prop_path is expected to include the prop name at this point.
+                details_path = prop_path[:-1]
+            else:
+                details_path = prop_path[:]
             if prop_name not in prop_details:
                 prop_details[prop_name] = {}
             prop_details[prop_name][prop_detail_key] = {
-                'paths': [prop_path],
+                'paths': [details_path],
                 'formatted_descr': formatted_details
                 }
 
@@ -1479,8 +1484,13 @@ class DocFormatter:
                 object_as_details = self.format_as_prop_details(obj_prop_name, prop_info.get('_ref_description'),
                                                                     object_formatted['rows'], anchor)
                 # TODO
-                import pdb; pdb.set_trace()
-                prop_details.update({obj_prop_name : object_as_details})
+                new_details = {obj_prop_name: {
+                    prop_info.get('_ref_uri', '_inline'): {
+                        'paths': [new_path],
+                        'formatted_descr': object_as_details
+                        }
+                    }}
+                self.merge_prop_details(prop_details, new_details)
                 object_formatted['rows'] = []
             else:
                 object_formatted = self.format_object_descr(schema_ref, prop_info, new_path, is_action)
@@ -1717,7 +1727,7 @@ class DocFormatter:
                 if formatted:
                     output.append(formatted['row'])
                     if formatted['details']:
-                        details.update(formatted['details'])
+                        self.merge_prop_details(details, formatted['details'])
                     if formatted['action_details']:
                         action_details[prop_name] = formatted['action_details']
                     if formatted.get('profile_conditional_details'):
@@ -1916,8 +1926,7 @@ class DocFormatter:
                         prop_details[key][ref] = det[ref]
                     else:
                         if prop_details[key][ref]['formatted_descr'] != det[ref]['formatted_descr']:
-                            import pdb; pdb.set_trace()
-                            pass # Something is wrong!
+                            warnings.warn("mismatch detected in descriptions for " + key)
                         for path in det[ref]['paths']:
                             prop_details[key][ref]['paths'].append(path)
 
