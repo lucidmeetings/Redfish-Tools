@@ -306,11 +306,6 @@ class CsvGenerator(DocFormatter):
             self.writer.writerow(row)
 
 
-    def add_property_details(self, formatted_details):
-        """Add a chunk of property details information for the current section/schema."""
-        self.this_section['property_details'].append(formatted_details)
-
-
     def add_registry_reqs(self, registry_reqs):
         """ CSV output doesn't include registry requirements. """
         pass

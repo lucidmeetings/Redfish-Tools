@@ -180,11 +180,6 @@ class DocFormatter:
         formatted_row should be a chunk of text already formatted for output"""
         raise NotImplementedError
 
-    def add_property_details(self, formatted_details):
-        """Add a chunk of property details information for the current section/schema."""
-        raise NotImplementedError
-
-
     def add_registry_reqs(self, registry_reqs):
         """Add registry messages. registry_reqs includes profile annotations."""
         raise NotImplementedError
@@ -503,7 +498,6 @@ class DocFormatter:
                     self.ref_counts[schema_ref] = self.summarize_duplicates(self.ref_deduplicator.get(schema_ref, {}))
 
                 for prop_name in prop_names:
-                    # prop_infos = prop_info_stash[prop_name]
                     prop_info = properties[prop_name]
                     prop_info['prop_required'] = prop_info.get('prop_required') or prop_name in required
                     prop_info['prop_required_on_create'] = prop_info.get('prop_required_on_create') or prop_name in required_on_create
@@ -517,18 +511,16 @@ class DocFormatter:
                         if prop_name != 'Actions' or self.config.get('actions_in_property_table', True):
                             self.add_property_row(formatted['row'])
                         if formatted['details']:
-                            prop_details.update(formatted['details'])
+                            self.merge_prop_details(prop_details, formatted['details'])
                         if formatted['action_details']:
                             self.add_action_details(formatted['action_details'])
                         if formatted.get('profile_conditional_details'):
                             conditional_details.update(formatted['profile_conditional_details'])
 
-                prop_details.update(self.common_property_details)
+                if self.common_property_details:
+                    self.merge_prop_details(prop_details, self.common_property_details)
                 if len(prop_details):
-                    detail_names = [x for x in prop_details.keys()]
-                    detail_names.sort(key=str.lower)
-                    for detail_name in detail_names:
-                        self.add_property_details(prop_details[detail_name])
+                    self.merge_prop_details(self.this_section['property_details'], prop_details)
 
                 if len(conditional_details):
                     cond_names = [x for x in conditional_details.keys()]
@@ -600,12 +592,7 @@ class DocFormatter:
             if prop_name != 'Actions' or self.config.get('actions_in_property_table', True):
                 frag_gen.add_property_row(formatted['row'])
             if len(formatted['details']):
-                prop_details = {}
-                prop_details.update(formatted['details'])
-                detail_names = [x for x in prop_details.keys()]
-                detail_names.sort(key=str.lower)
-                for detail_name in detail_names:
-                    frag_gen.add_property_details(prop_details[detail_name])
+                frag_gen.merge_prop_details(frag_gen.this_section['property_details'], formatted['details'])
 
             if formatted['action_details']:
                 frag_gen.add_action_details(formatted['action_details'])
@@ -656,7 +643,6 @@ class DocFormatter:
                 ref_id = 'common-properties-' + prop_name
                 if version:
                     ref_id += '_v' + version
-                    # prop_name += ' ' + version
 
                 cp_gen.add_section(prop_name, ref_id)
                 cp_gen.add_json_payload(supplemental.get('jsonpayload'))
@@ -683,12 +669,7 @@ class DocFormatter:
                 if prop_name != 'Actions' or self.config.get('actions_in_property_table', True):
                     cp_gen.add_property_row(formatted['row'])
                 if len(formatted['details']):
-                    prop_details = {}
-                    prop_details.update(formatted['details'])
-                    detail_names = [x for x in prop_details.keys()]
-                    detail_names.sort(key=str.lower)
-                    for detail_name in detail_names:
-                        cp_gen.add_property_details(prop_details[detail_name])
+                    cp_gen.merge_prop_details(cp_gen.this_section['property_details'], formatted['details'])
 
                 if formatted['action_details']:
                     cp_gen.add_action_details(formatted['action_details'])
@@ -1241,6 +1222,7 @@ class DocFormatter:
                 parsed['prop_is_object'] |= det['prop_is_object']
                 parsed['prop_is_array'] |= det['prop_is_array']
                 parsed['has_direct_prop_details'] |= det['has_direct_prop_details']
+                import pdb; pdb.set_trace()
                 parsed['prop_details'].update(det['prop_details'])
                 parsed['has_action_details'] |= det['has_action_details']
                 parsed['action_details'].update(det['action_details'])
@@ -1386,7 +1368,7 @@ class DocFormatter:
                 # Capture the enum details and merge them into the ones for the overall properties:
                 if formatted_action and formatted_action.get('details'):
                     has_prop_details = True
-                    prop_details.update(formatted_action['details'])
+                    self.merge_prop_details(prop_details, formatted_action['details'])
 
             self.add_action_details(action_details)
 
@@ -1449,11 +1431,18 @@ class DocFormatter:
             else:
                 prop_enum_details = prop_info.get('enumDescriptions')
             anchor = schema_ref + '|details|' + prop_name
-            prop_details[prop_name] = self.format_property_details(prop_name, prop_type, descr,
-                                                                   prop_enum, prop_enum_details,
-                                                                   supplemental_details,
-                                                                   prop_info,
-                                                                   anchor=anchor, profile=profile)
+            formatted_details = self.format_property_details(prop_name, prop_type, descr,
+                                                                 prop_enum, prop_enum_details,
+                                                                 supplemental_details,
+                                                                 prop_info,
+                                                                 anchor=anchor, profile=profile)
+            prop_detail_key = prop_info.get('_ref_uri', '_inline')
+            if prop_name not in prop_details:
+                prop_details[prop_name] = {}
+            prop_details[prop_name][prop_detail_key] = {
+                'paths': [prop_path],
+                'formatted_descr': formatted_details
+                }
 
         # Action details may be supplied as markdown in the supplemental doc.
         # Possibly we should be phasing this out.
@@ -1489,13 +1478,15 @@ class DocFormatter:
                 anchor = schema_ref + '|details_combined_ref|' + obj_prop_name
                 object_as_details = self.format_as_prop_details(obj_prop_name, prop_info.get('_ref_description'),
                                                                     object_formatted['rows'], anchor)
+                # TODO
+                import pdb; pdb.set_trace()
                 prop_details.update({obj_prop_name : object_as_details})
                 object_formatted['rows'] = []
             else:
                 object_formatted = self.format_object_descr(schema_ref, prop_info, new_path, is_action)
                 object_description = object_formatted['rows']
             if object_formatted['details']:
-                prop_details.update(object_formatted['details'])
+                self.merge_prop_details(prop_details, object_formatted['details'])
 
         # embedded items:
         if prop_is_array and (list_of_objects or list_of_simple_type or prop_item):
@@ -1542,8 +1533,7 @@ class DocFormatter:
             promote_me = item_formatted.get('promote_me', False)
             item_description = item_formatted['rows']
             if item_formatted['details']:
-                prop_details.update(item_formatted['details'])
-
+                self.merge_prop_details(prop_details, item_formatted['details'])
 
         # Read/Write requirements from profile:
         if self.config.get('profile_mode') and prop_name and profile is not None:
@@ -1913,6 +1903,23 @@ class DocFormatter:
             else:
                 summary.update(self.summarize_duplicates(data))
         return summary
+
+
+    def merge_prop_details(self, prop_details, new_details):
+        """ add new_details into prop_details, respecting the structure of prop_details. """
+        for (key, det) in new_details.items():
+            if key not in prop_details:
+                prop_details[key] = det
+            else:
+                for ref in det:
+                    if ref not in prop_details[key]:
+                        prop_details[key][ref] = det[ref]
+                    else:
+                        if prop_details[key][ref]['formatted_descr'] != det[ref]['formatted_descr']:
+                            import pdb; pdb.set_trace()
+                            pass # Something is wrong!
+                        for path in det[ref]['paths']:
+                            prop_details[key][ref]['paths'].append(path)
 
 
     # Override in HTML formatter to get actual links.

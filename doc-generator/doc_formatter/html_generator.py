@@ -918,7 +918,7 @@ pre.code{
 
         self.this_section = {
             'properties': [],
-            'property_details': [],
+            'property_details': {},
             'head': '',
             'heading': ''
             }
@@ -997,11 +997,6 @@ pre.code{
 
         formatted_row should be a chunk of text already formatted for output"""
         self.this_section['properties'].append(formatted_text)
-
-
-    def add_property_details(self, formatted_details):
-        """Add a chunk of property details information for the current section/schema."""
-        self.this_section['property_details'].append(formatted_details)
 
 
     def add_registry_reqs(self, registry_reqs):

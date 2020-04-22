@@ -118,7 +118,7 @@ class PropertyIndexGenerator(DocFormatter):
 
         self.this_section = {
             'properties': [],
-            'property_details': [],
+            'property_details': {},
             'head': '',
             'heading': '',
             'schema_name': text

@@ -643,7 +643,27 @@ class MarkdownGenerator(DocFormatter):
                 contents.append('\n\n'.join(section.get('action_details')))
             if section.get('property_details'):
                 contents.append('\n' + self.formatter.head_two('Property details', self.level))
-                contents.append('\n'.join(section['property_details']))
+                detail_names = [x for x in section['property_details'].keys()]
+                detail_names.sort(key=str.lower)
+                for detail_name in detail_names:
+                    contents.append(self.formatter.head_three(detail_name + ':', 0))
+                    det_info = section['property_details'][detail_name]
+                    if len(det_info) == 1:
+                        for x in det_info.values():
+                            contents.append(x['formatted_descr'])
+                    else:
+                        path_to_ref = {}
+                        # Generate path descriptions and sort them.
+                        for ref, info in det_info.items():
+                            paths_as_text = [": ".join(x) for x in info['paths']]
+                            paths_as_text = ', '.join(paths_as_text)
+                            path_to_ref[paths_as_text] = ref
+                        paths_sorted = [x for x in path_to_ref.keys()]
+                        paths_sorted.sort(key=str.lower)
+                        for path in paths_sorted:
+                            info = det_info[path_to_ref[path]]
+                            contents.append(self.formatter.para(self.formatter.bold("In " + path + ":")))
+                            contents.append(info['formatted_descr'])
 
         self.sections = []
 
@@ -762,7 +782,7 @@ search: true
         self.this_section = {'head': text,
                              'heading': '\n' + self.formatter.head_one(text, self.level),
                              'properties': [],
-                             'property_details': []
+                             'property_details': {}
                             }
         self.sections.append(self.this_section)
 
@@ -805,11 +825,6 @@ search: true
 
         formatted_row should be a chunk of text already formatted for output"""
         self.this_section['properties'].append(formatted_text)
-
-
-    def add_property_details(self, formatted_details):
-        """Add a chunk of property details information for the current section/schema."""
-        self.this_section['property_details'].append(formatted_details)
 
 
     def add_registry_reqs(self, registry_reqs):
