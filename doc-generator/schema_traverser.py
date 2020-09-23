@@ -15,13 +15,6 @@ import types
 import warnings
 from doc_gen_util import DocGenUtilities
 
-# Format user warnings simply
-def simple_warning_format(message, category, filename, lineno, file=None, line=None):
-    """ a basic format for warnings from this program """
-    return '  Warning: %s (%s:%s)' % (message, filename, lineno) + "\n"
-
-warnings.formatwarning = simple_warning_format
-
 
 class SchemaTraverser:
     """Provides methods for traversing Redfish schemas (imported from JSON into objects). """

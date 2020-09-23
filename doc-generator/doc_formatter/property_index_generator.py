@@ -23,13 +23,6 @@ from doc_gen_util import DocGenUtilities
 from . import DocFormatter
 from . import ToCParser
 
-# Format user warnings simply
-def simple_warning_format(message, category, filename, lineno, file=None, line=None):
-    """ a basic format for warnings from this program """
-    return '  Warning: %s (%s:%s)' % (message, filename, lineno) + "\n"
-
-warnings.formatwarning = simple_warning_format
-
 class PropertyIndexGenerator(DocFormatter):
     """Provides methods for generating Property Index docs from Redfish schemas."""
 

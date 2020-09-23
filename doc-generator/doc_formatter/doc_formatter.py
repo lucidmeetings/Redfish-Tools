@@ -19,6 +19,7 @@ import functools
 from doc_gen_util import DocGenUtilities
 from format_utils import FormatUtils
 
+
 class DocFormatter:
     """Generic class for schema documentation formatter"""
 

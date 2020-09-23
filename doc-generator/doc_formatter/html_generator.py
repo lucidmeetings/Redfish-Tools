@@ -19,14 +19,6 @@ from format_utils import HtmlUtils
 from . import DocFormatter
 from . import ToCParser
 
-# Format user warnings simply
-def simple_warning_format(message, category, filename, lineno, file=None, line=None):
-    """ a basic format for warnings from this program """
-    return '  Warning: %s (%s:%s)' % (message, filename, lineno) + "\n"
-
-warnings.formatwarning = simple_warning_format
-
-
 class HtmlGenerator(DocFormatter):
     """Provides methods for generating markdown from Redfish schemas. """
 

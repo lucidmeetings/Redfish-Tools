@@ -21,25 +21,16 @@ import json
 import copy
 import functools
 import warnings
+import gettext
 from doc_gen_util import DocGenUtilities
 from schema_traverser import SchemaTraverser
 import parse_supplement
 
 
-# Format user warnings simply
 class InfoWarning(UserWarning):
     """ A warning class for informational messages that don't need a stack trace. """
     pass
 
-def simple_warning_format(message, category, filename, lineno, file=None, line=None):
-    """ a basic format for warnings from this program """
-    if category == InfoWarning:
-        return '  Info: %s' % (message) + "\n"
-    else:
-        return '  Warning: %s (%s:%s)' % (message, filename, lineno) + "\n"
-
-
-warnings.formatwarning = simple_warning_format
 
 class DocGenerator:
     """Redfish Documentation Generator class. Provides 'generate_docs' method."""
@@ -51,6 +42,23 @@ class DocGenerator:
         self.property_data = {} # This is an object property for ease of testing.
         self.schema_ref_to_filename = {}
         self.config['payloads'] = None
+
+        # Localization
+        languages = [config.get('locale', 'en')]
+        localedir = os.path.join(os.path.dirname(__file__), 'locale')
+        translations = gettext.translation('doc_generator', localedir=localedir, languages=languages)
+        translations.install()
+        _ = translations.gettext
+
+        # Set up our simplified warning format. We need _ defined with the correct language before we do this.
+        def simple_warning_format(message, category, filename, lineno, file=None, line=None):
+            """ a basic format for warnings from this program """
+            if category == InfoWarning:
+                return _('  Info: %s') % (message) + "\n"
+            else:
+                return _('  Warning: %s (%s:%s)') % (message, filename, lineno) + "\n"
+        warnings.formatwarning = simple_warning_format
+
 
         if config.get('payload_dir'):
             payload_dir = config.get('payload_dir')
