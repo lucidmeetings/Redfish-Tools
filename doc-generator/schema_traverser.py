@@ -1,5 +1,5 @@
 # Copyright Notice:
-# Copyright 2016 Distributed Management Task Force, Inc. All rights reserved.
+# Copyright 2016-2020 Distributed Management Task Force, Inc. All rights reserved.
 # License: BSD 3-Clause License. For full text see link: https://github.com/DMTF/Redfish-Tools/blob/master/LICENSE.md
 
 """
@@ -43,7 +43,7 @@ class SchemaTraverser:
             mutable_schemas[uri] = data
             self.schemas = types.MappingProxyType(mutable_schemas)
         else:
-            warnings.warn("Not overwriting traverser's schema data for " + uri)
+            warnings.warn("Not overwriting traverser's schema data for %(uri)s" % {'uri': uri})
 
 
     def find_ref_data(self, ref):

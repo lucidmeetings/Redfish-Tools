@@ -1,5 +1,5 @@
 # Copyright Notice:
-# Copyright 2016 Distributed Management Task Force, Inc. All rights reserved.
+# Copyright 2016-2020 Distributed Management Task Force, Inc. All rights reserved.
 # License: BSD 3-Clause License. For full text see link: https://github.com/DMTF/Redfish-Tools/blob/master/LICENSE.md
 
 """
@@ -294,9 +294,10 @@ pre.code{
             if formatted_details['has_direct_prop_details'] and not formatted_details['has_action_details']:
                 if has_enum:
                     anchor = schema_ref + '|details|' + prop_name
-                    text_descr = 'For the possible property values, see <a href="#' + anchor + '">' + prop_name + '</a> in Property details.'
+                    text_descr = (_('For the possible property values, see %(link)s in Property details.') %
+                                      {'link': '<a href="#' + anchor + '">' + prop_name + '</a>'})
                 else:
-                    text_descr = 'For more information about this property, see Property details.'
+                    text_descr = _('For more information about this property, see Property details.')
                 if formatted_details['descr']:
                     formatted_details['descr'] += '<br>' + self.formatter.italic(text_descr)
                 else:
@@ -305,7 +306,8 @@ pre.code{
             # If this is an Action with details, add a note to the description:
             if formatted_details['has_action_details']:
                 anchor = schema_ref + '|action_details|' + prop_name
-                text_descr = 'For more information, see the <a href="#' + anchor + '">Actions</a> section below.'
+                text_descr = (_('For more information, see the %(link)s section below.') %
+                                  {'link': '<a href="#' + anchor + '">' + _('Actions') + '</a>'})
                 formatted_details['descr'] += '<br>' + self.formatter.italic(text_descr)
 
         if deprecated_descr:
@@ -336,50 +338,51 @@ pre.code{
                 and not formatted_details.get('array_of_objects')
                 and not as_action_parameters):
             if formatted_details['read_only']:
-                prop_access = '<nobr>read-only</nobr>'
+                prop_access = '<nobr>' + _('read-only') + '</nobr>'
             else:
                 # Special case for subset mode; if profile indicates WriteRequirement === None (present and None),
                 # emit read-only.
                 if ((self.config.get('profile_mode') == 'subset')
                         and formatted_details.get('profile_write_req')
                         and (formatted_details['profile_write_req'] == 'None')):
-                        prop_access = '<nobr>read-only</nobr>'
+                        prop_access = '<nobr>' + _('read-only') + '</nobr>'
                 else:
-                    prop_access = '<nobr>read-write</nobr>'
+                    prop_access = '<nobr>' + _('read-write') + '</nobr>'
 
         if formatted_details['prop_required'] or formatted_details.get('required_parameter'):
-            prop_access += ' <nobr>required</nobr>'
+            prop_access += ' <nobr>' + _('required') + '</nobr>'
         elif formatted_details['prop_required_on_create']:
-            prop_access += ' <nobr>required on create</nobr>'
+            prop_access += ' <nobr>' + _('required on create') + '</nobr>'
         elif as_action_parameters:
-            prop_access += ' optional'
+            prop_access += ' ' + _('optional')
 
         if formatted_details['nullable']:
-            prop_access += ' (null)'
+            prop_access += ' ' + _('(null)')
 
         # If profile reqs are present, massage them:
         profile_access = self.format_base_profile_access(formatted_details)
 
         descr = formatted_details['descr']
         if formatted_details['profile_purpose'] and (self.config.get('profile_mode') != 'subset'):
-            descr += '<br>' + self.formatter.bold("Profile Purpose: " + formatted_details['profile_purpose'])
+            descr += '<br>' + self.formatter.bold(_('Profile Purpose: %(purpose)s') % {'purpose': formatted_details['profile_purpose']})
 
         # Conditional Requirements
         cond_req = formatted_details['profile_conditional_req']
         if cond_req:
             anchor = schema_ref + '|conditional_reqs|' + prop_name
-            cond_req_text = 'See <a href="#' + anchor + '"> Conditional Requirements</a>, below, for more information.'
+            cond_req_text = (_('See %(link)s, below, for more information.') %
+                                 {'link': '<a href="#' + anchor + '">' + _('Conditional Requirements') + '</a>'})
             descr += ' ' + self.formatter.nobr(self.formatter.italic(cond_req_text))
-            profile_access += "<br>" + self.formatter.nobr(self.formatter.italic('Conditional Requirements'))
+            profile_access += "<br>" + self.formatter.nobr(self.formatter.italic(_('Conditional Requirements')))
 
         if not profile_access:
             profile_access = '&nbsp;' * 10
 
         # Comparison
         if formatted_details['profile_values']:
-            comparison_descr = ('Must be ' + formatted_details['profile_comparison'] + ' ('
-                                + ', '.join('"' + x + '"' for x in formatted_details['profile_values'])
-                                + ')')
+            comparison_descr = (_('Must be %(comparison_word)s (%(values)s)') %
+                                    {'comparison_words': formatted_details['profile_comparison'],
+                                     'values': ', '.join('"' + x + '"' for x in formatted_details['profile_values'])})
             profile_access += '<br>' + self.formatter.italic(comparison_descr)
 
         row = []
@@ -460,9 +463,9 @@ pre.code{
             contents.append(self.formatter.markdown_to_html(supplemental_details))
 
         if enum_details:
-            headings = [prop_type, 'Description']
+            headings = [prop_type, _('Description')]
             if profile_mode and profile_mode != 'subset':
-                headings.append('Profile Specifies')
+                headings.append(_('Profile Specifies'))
             header_row = self.formatter.make_header_row(headings)
             table_rows = []
             enum.sort(key=str.lower)
@@ -491,19 +494,23 @@ pre.code{
                     if version_depr:
                         version_depr_text = html.escape(version_depr, False)
                         deprecated_display = self.truncate_version(version_depr_text, 2)
-                        enum_name += ' ' + self.formatter.italic('(v' + version_display + ', deprecated v' + deprecated_display + ')')
+                        enum_name += ' ' + self.formatter.italic(_('(v%(version_number)s, deprecated v%(deprecated_version)s)') %
+                                                                     {'version_number': version_display,
+                                                                          'deprecated_version': deprecated_display})
                         if deprecated_descr:
-                            deprecated_descr_text = html.escape('Deprecated in v' + deprecated_display
-                                                                    + ' and later. ' + deprecated_descr)
+                            deprecated_descr_text = html.escape(_('Deprecated in v%(version_number)s and later. %(explanation)s') %
+                                                                    {'version_number': deprecated_display,
+                                                                         'explanation': deprecated_descr})
                     else:
-                        enum_name += ' ' + self.formatter.italic('(v' + version_display + ')')
+                        enum_name += ' ' + self.formatter.italic(_('(v%(version_number)s)') % {'version_number': version_display})
                 elif version_depr:
                     version_depr_text = html.escape(version_depr, False)
                     deprecated_display = self.truncate_version(version_depr_text, 2)
-                    enum_name += ' ' + self.formatter.italic('(deprecated v' + deprecated_display + ')')
+                    enum_name += ' ' + self.formatter.italic(_('(deprecated v%(version_number)s)') % {'version_number': deprecated_display})
                     if deprecated_descr:
-                        deprecated_descr_text = html.escape('Deprecated in v' + deprecated_display + ' and later. ' +
-                                                        deprecated_descr)
+                        deprecated_descr_text = html.escape(_('Deprecated in v%(version_number)s and later. %(explanation)s') %
+                                                                {'version_number': deprecated_display,
+                                                                     'explanation': deprecated_descr})
 
                 descr = html.escape(enum_details.get(enum_item, ''), False)
                 if deprecated_descr:
@@ -515,13 +522,13 @@ pre.code{
 
                 if profile_mode and profile_mode != 'subset':
                     if enum_name in profile_values:
-                        cells.append('Mandatory')
+                        cells.append(self.text_map('Mandatory'))
                     elif enum_name in profile_min_support_values:
-                        cells.append('Mandatory')
+                        cells.append(self.text_map('Mandatory'))
                     elif enum_name in profile_parameter_values:
-                        cells.append('Mandatory')
+                        cells.append(self.text_map('Mandatory'))
                     elif enum_name in profile_recommended_values:
-                        cells.append('Recommended')
+                        cells.append(self.text_map('Recommended'))
                     else:
                         cells.append('')
 
@@ -531,7 +538,7 @@ pre.code{
         elif enum:
             headings = [prop_type]
             if profile_mode and profile_mode != 'subset':
-                headings.append('Profile Specifies')
+                headings.append(_('Profile Specifies'))
             header_row = self.formatter.make_header_row(headings)
             table_rows = []
             enum.sort(key=str.lower)
@@ -562,39 +569,43 @@ pre.code{
                     if version_depr:
                         version_depr_text = html.escape(version_depr, False)
                         deprecated_display = self.truncate_version(version_depr_text, 2)
-                        enum_name += ' ' + self.formatter.italic('(v' + version_display + ', deprecated v' + deprecated_display + ')')
+                        enum_name += ' ' + self.formatter.italic(_('(v%(version_number)s, deprecated v%(deprecated_version)s)') %
+                                                                     {'version_number': version_display,
+                                                                          'explanation': deprecated_display})
                         if deprecated_descr:
                             enum_name += '<br>' + self.formatter.italic(html.escape(
-                                'Deprecated in v' + deprecated_display
-                                + ' and later. ' + deprecated_descr))
+                                _('Deprecated in v%(version_number)s and later. %(explanation)s') %
+                                {'version_number': deprecated_display,
+                                     'explanation': deprecated_descr}))
                     else:
-                        enum_name += ' ' + self.formatter.italic('(v' + version_display + ')')
+                        enum_name += ' ' + self.formatter.italic(_('(v%(version_number)s)') % {'version_number': version_display})
 
                 elif version_depr:
                     version_depr_text = html.escape(version_depr, False)
                     deprecated_display = self.truncate_version(version_depr_text, 2)
-                    enum_name += ' ' + self.formatter.italic('(deprecated v' + deprecated_display + ')')
+                    enum_name += ' ' + self.formatter.italic(_('(deprecated v%(version_number)s)') % {'version_number': deprecated_display})
                     if deprecated_descr:
                         enum_name += '<br>' + self.formatter.italic(html.escape(
-                            'Deprecated in v' + deprecated_display + ' and later. ' +
-                            deprecated_descr))
+                            _('Deprecated in v%(version_number)s and later. %(explanation)s') %
+                            {'version_number': deprecated_display,
+                                 'explanation': deprecated_descr}))
 
 
                 cells = [enum_name]
                 if profile_mode and profile_mode != 'subset':
                     if enum_name in profile_values:
-                        cells.append('Mandatory')
+                        cells.append(self.text_map('Mandatory'))
                     elif enum_name in profile_min_support_values:
-                        cells.append('Mandatory')
+                        cells.append(self.text_map('Mandatory'))
                     elif enum_name in profile_parameter_values:
-                        cells.append('Mandatory')
+                        cells.append(self.text_map('Mandatory'))
                     elif enum_name in profile_recommended_values:
-                        cells.append('Recommended')
+                        cells.append(self.text_map('Recommended'))
                     else:
                         cells.append('')
 
                 table_rows.append(self.formatter.make_row(cells))
-            contents.append(self.formatter.make_table(table_rows, [header_row], 'enum'))
+            contents.append(self.formatter.make_table(table_rows, [header_row], _('enum')))
 
         return '\n'.join(contents) + '\n'
 
@@ -607,7 +618,7 @@ pre.code{
         contents.append(self.formatter.markdown_to_html(action_details.get('text', '')))
         if action_details.get('example'):
             example = '```json\n' + action_details['example'] + '\n```\n'
-            contents.append(self.formatter.para('Example Action POST:'))
+            contents.append(self.formatter.para(_('Example Action POST:')))
             contents.append(self.formatter.markdown_to_html(example))
 
         return '\n'.join(contents) + '\n'
@@ -668,12 +679,12 @@ pre.code{
             tmp_row = self._add_closing_brace(tmp_row, '', '}')
             rows[-1] = tmp_row
 
-            formatted.append(self.formatter.para("Perform the action using a POST to the specific Action URI for this resource.  Parameters for the action are passed in a JSON body and are defined as follows:"))
+            formatted.append(self.formatter.para(_('Perform the action using a POST to the specific Action URI for this resource.  Parameters for the action are passed in a JSON body and are defined as follows:')))
 
             formatted.append(self.formatter.make_table(rows))
 
         else:
-            formatted.append(self.formatter.para("Perform the action using a POST to the specific Action URI for this resource.  This action takes no parameters."))
+            formatted.append(self.formatter.para(_('Perform the action using a POST to the specific Action URI for this resource.  This action takes no parameters.')))
 
         return "\n".join(formatted)
 
@@ -706,19 +717,19 @@ pre.code{
                 # sort them now; these can be sub-properties so may not be in alpha order.
                 conditional_details = '\n'.join(sorted(section['profile_conditional_details'], key=str.lower))
                 deets = []
-                deets.append(self.formatter.head_three('Conditional Requirements', self.level))
+                deets.append(self.formatter.head_three(_('Conditional Requirements'), self.level))
                 deets.append(self.formatter.make_div(conditional_details, 'property-details-content'))
                 contents.append(self.formatter.make_div('\n'.join(deets), 'property-details'))
 
             if len(section.get('action_details', [])):
                 action_details = '\n'.join(section['action_details'])
                 deets = []
-                deets.append(self.formatter.head_three('Actions', self.level))
+                deets.append(self.formatter.head_three(_('Actions'), self.level))
                 deets.append(self.formatter.make_div(action_details, 'property-details-content'))
                 contents.append(self.formatter.make_div('\n'.join(deets), 'property-details'))
             if section.get('property_details'):
                 deets = []
-                deets.append(self.formatter.head_three('Property details', self.level))
+                deets.append(self.formatter.head_three(_('Property details'), self.level))
                 # Sort and output property details
                 detail_names = [x for x in section['property_details'].keys()]
                 detail_names.sort(key=str.lower)
@@ -749,7 +760,7 @@ pre.code{
                 contents.append(self.formatter.make_div('\n'.join(deets), 'property-details'))
 
             if section.get('json_payload'):
-                contents.append(self.formatter.head_three('Example response', self.level))
+                contents.append(self.formatter.head_three(_('Example response'), self.level))
                 contents.append(section['json_payload'])
 
         self.sections = []
@@ -761,11 +772,11 @@ pre.code{
             if section.get('description'):
                 contents.append(self.formatter.para(section['description']))
             if section.get('messages'):
-                contents.append(self.formatter.head_three('Messages', self.level))
+                contents.append(self.formatter.head_three(_('Messages'), self.level))
                 message_rows = [self.formatter.make_row(x) for x in section['messages']]
-                header_cells = ['', 'Requirement']
+                header_cells = ['', _('Requirement')]
                 if self.config.get('profile_mode') != 'terse':
-                    header_cells.append('Description')
+                    header_cells.append(_('Description'))
                 header_row = self.formatter.make_row(header_cells)
                 contents.append(self.formatter.make_table(message_rows, [header_row], 'messages'))
 
@@ -948,18 +959,18 @@ pre.code{
             uri_strings.append('<li class="hanging-indent">' + self.format_uri(uri) + '</li>')
 
         uri_block = '<ul class="nobullet">' + '\n'.join(uri_strings) + '</ul>'
-        uri_content = '<h4>URIs:</h4>' + uri_block
+        uri_content = '<h4>' + _('URIs:') + '</h4>' + uri_block
         self.this_section['uris'] = uri_content
 
 
     def add_conditional_requirements(self, text):
         """ Add a conditional requirements, which should already be formatted """
-        self.this_section['conditional_requirements'] = '<h4>Conditional Requirements:</h4>' + text
+        self.this_section['conditional_requirements'] = '<h4>' + _('Conditional Requirements:') + '</h4>' + text
 
 
     def format_uri_block_for_action(self, action, uris):
         """ Create a URI block for this action & the resource's URIs """
-        uri_content = '<b>Action URI: {Base URI of target resource}/Actions/' + action + '</b><br><br>'
+        uri_content = '<b>' + (_('Action URI: %(link)s') % {'link': '{Base URI of target resource}/Actions/' + action}) + '</b><br><br>'
         return uri_content
 
 
@@ -1016,12 +1027,12 @@ pre.code{
                 'description': reg.get('Description', ''),
                 'messages': []
                 }
-            heading = reg_name + ' Registry v' + reg['minversion']  + '+'
+            heading = reg_name + ' ' + (_('Registry v%(version_number)s+') % {'version_number': reg['minversion']})
             if reg.get('current_release', reg['minversion']) != reg['minversion']:
-                heading += ' (current release: v' + reg['current_release'] + ')'
+                heading += ' ' + (_('(current release: v%(version_number)s)') % {'version_number': reg['current_release']})
 
             this_section['heading'] = self.formatter.head_two(heading, self.level)
-            this_section['requirement'] = 'Requirement: ' + reg.get('profile_requirement', '')
+            this_section['requirement'] = _('Requirement: %(req)s') % {'req': reg.get('profile_requirement', '')}
 
             msgs = reg.get('Messages', {})
             msg_keys = [x for x in msgs.keys()]
@@ -1096,7 +1107,7 @@ pre.code{
 
         target = self.get_documentation_uri(ref_uri)
         if target:
-            return 'See <a href="' + target + '" target="_blank">' + target + '</a>'
+            return _('See %(link)s') % {'link': '<a href="' + target + '" target="_blank">' + target + '</a>'}
         return False
 
 
