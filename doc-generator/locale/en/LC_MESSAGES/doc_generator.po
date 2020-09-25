@@ -5,7 +5,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
-"POT-Creation-Date: 2020-09-25 11:46-0700\n"
+"POT-Creation-Date: 2020-09-25 12:10-0700\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -248,7 +248,7 @@ msgstr ""
 msgid "Recommended"
 msgstr ""
 
-#: doc_formatter/html_generator.py:297
+#: doc_formatter/html_generator.py:297 doc_formatter/markdown_generator.py:175
 msgid "For the possible property values, see %(link)s in Property details."
 msgstr ""
 
@@ -387,10 +387,6 @@ msgstr ""
 
 #: doc_formatter/html_generator.py:1110
 msgid "See %(link)s"
-msgstr ""
-
-#: doc_formatter/markdown_generator.py:175
-msgid "For the possible property values, see %(name)s in Property details."
 msgstr ""
 
 #: doc_formatter/markdown_generator.py:181

@@ -7,7 +7,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
-"POT-Creation-Date: 2020-09-25 10:53-0700\n"
+"POT-Creation-Date: 2020-09-25 12:10-0700\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -250,9 +250,9 @@ msgstr "MANDATORY"
 msgid "Recommended"
 msgstr "RECOMMENDED"
 
-#: doc_formatter/html_generator.py:297
+#: doc_formatter/html_generator.py:297 doc_formatter/markdown_generator.py:175
 msgid "For the possible property values, see %(link)s in Property details."
-msgstr ""
+msgstr "FOR THE POSSIBLE PROPERTY VALUES, SEE %(link)s IN PROPERTY DETAILS."
 
 #: doc_formatter/html_generator.py:300 doc_formatter/markdown_generator.py:177
 msgid "For more information about this property, see Property details."
@@ -390,10 +390,6 @@ msgstr "REQUIREMENT: %(req)s"
 #: doc_formatter/html_generator.py:1110
 msgid "See %(link)s"
 msgstr "SEE %(link)s"
-
-#: doc_formatter/markdown_generator.py:175
-msgid "For the possible property values, see %(name)s in Property details."
-msgstr "FOR THE POSSIBLE PROPERTY VALUES, SEE %(name)s IN PROPERTY DETAILS."
 
 #: doc_formatter/markdown_generator.py:181
 msgid "For more information, see the Actions section below."
