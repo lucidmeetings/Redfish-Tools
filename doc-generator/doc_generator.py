@@ -1149,6 +1149,7 @@ class DocGenerator:
                 'supfile', 'format', 'outfile', 'payload_dir', 'normative',
                 'profile_doc', 'subset_doc',
                 'property_index', 'property_index_config_out', 'escape_chars',
+                'locale'
                 ]
             for x in config_args:
                 if config_data.get(x) and (x not in combined_args or combined_args[x] is None):
@@ -1402,6 +1403,9 @@ class DocGenerator:
 
         if combined_args.get('escape_chars'):
             config['escape_chars'] = [x for x in combined_args['escape_chars']]
+
+        if combined_args.get('locale'):
+            config['locale'] = combined_args['locale']
 
         return config
 
