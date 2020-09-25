@@ -331,7 +331,7 @@ class DocGenerator:
         files_to_process = []
         for file_to_import in text_input:
             if os.path.isdir(file_to_import):
-                for root, _, files in os.walk(file_to_import):
+                for root, _skip, files in os.walk(file_to_import):
                     # NB: this is an adequate sort for file-grouping purposes. It's not guaranteed to sort versions correctly.
                     files.sort(key=str.lower)
                     for filename in files:

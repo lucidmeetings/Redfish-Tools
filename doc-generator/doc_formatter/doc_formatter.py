@@ -141,11 +141,11 @@ class DocFormatter:
             if version_deprecated:
                 version_depr_text = self.escape_text(version_depr)
                 deprecated_display = self.truncate_version(version_depr_text, 2)
-                version_string = _('(v%(version_string)s, deprecated v%(deprecated_version)s') % {'version_string': version_display, 'deprecated_version':  deprecated_display}
+                version_string = _('(v%(version_number)s, deprecated v%(deprecated_version)s') % {'version_number': version_display, 'deprecated_version':  deprecated_display}
                 deprecated_descr = self.escape_text(_('Deprecated in v%(deprecated_version)s and later. %(explanation)s') % {'deprecated_version': deprecated_display,
                                                                                                                                 'explanation': version_deprecated_explanation})
             else:
-                version_string = _('(v%(version_string)s)') % {'version_string': version_display}
+                version_string = _('(v%(version_number)s)') % {'version_number': version_display}
         elif version_deprecated:
             version_depr_text = self.escape_text(version_depr)
             deprecated_display = self.truncate_version(version_depr_text, 2)
@@ -410,7 +410,7 @@ class DocFormatter:
                 # Don't output the base requirement
                 continue
             elif subordinate_to:
-                req_desc = _('Resource instance is subordinate to %(resource_list)s') % {'resource_list':  _(' from ').join('"' + x + '"' for x in subordinate_to)}
+                req_desc = _('Resource instance is subordinate to %(resource_list)s') % {'resource_list':  (' ' + _('from') + ' ').join('"' + x + '"' for x in subordinate_to)}
             elif uris:
                 req_desc = "Resource URI is: " + self.format_uris_for_table(uris)
                 if self.config['MinVersionLT1.6']:
@@ -419,15 +419,15 @@ class DocFormatter:
             if compare_property:
                 compare_to = creq.get('CompareType', '')
                 if compare_to in ['Equal', 'LessThanOrEqual', 'GreaterThanOrEqual', 'NotEqual']:
-                    compare_to += _(' to')
+                    compare_to += ' ' +  _('to')
 
                 compare_values = creq.get('CompareValues')
                 if compare_values:
                     compare_values = ', '.join(['"' + x + '"' for x in compare_values])
 
                 if req_desc:
-                    req_desc += _(' and ')
-                req_desc += '"' + compare_property + '"' + _(' is ') + compare_to
+                    req_desc += ' ' + _('and') + ' '
+                req_desc += '"' + compare_property + '" ' + _('is') + ' ' + compare_to
 
                 if compare_values:
                     req_desc += ' ' + compare_values
@@ -954,9 +954,9 @@ class DocFormatter:
                                                 # of IPv6GatewayStaticAddress.
                                                 ref_info['type'] = 'object'
                                             if specific_version:
-                                                append_ref = (_('For property details, see %(schema_link)s v%(version_string)s).') %
+                                                append_ref = (_('For property details, see %(schema_link)s v%(version_number)s).') %
                                                                  {'schema_link': self.link_to_common_property(ref_key),
-                                                                      'version_string': str(specific_version)})
+                                                                      'version_number': str(specific_version)})
                                             else:
                                                 append_ref = (_('For property details, see %(schema_link)s.') % {'schema_link': self.link_to_common_property(ref_key)})
 

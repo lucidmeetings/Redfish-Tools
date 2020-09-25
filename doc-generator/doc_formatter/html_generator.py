@@ -679,12 +679,12 @@ pre.code{
             tmp_row = self._add_closing_brace(tmp_row, '', '}')
             rows[-1] = tmp_row
 
-            formatted.append(self.formatter.para(_('Perform the action using a POST to the specific Action URI for this resource.  Parameters for the action are passed in a JSON body and are defined as follows:')))
+            formatted.append(self.formatter.para(_('Perform the action using a POST to the specific Action URI for this resource. Parameters for the action are passed in a JSON body and are defined as follows:')))
 
             formatted.append(self.formatter.make_table(rows))
 
         else:
-            formatted.append(self.formatter.para(_('Perform the action using a POST to the specific Action URI for this resource.  This action takes no parameters.')))
+            formatted.append(self.formatter.para(_('Perform the action using a POST to the specific Action URI for this resource. This action takes no parameters.')))
 
         return "\n".join(formatted)
 
