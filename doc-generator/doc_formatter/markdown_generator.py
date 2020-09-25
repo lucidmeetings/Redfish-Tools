@@ -463,7 +463,7 @@ class MarkdownGenerator(DocFormatter):
             contents.append(action_details.get('text'))
         if action_details.get('example'):
             example = '```json\n' + action_details['example'] + '\n```\n'
-            contents.append(_('Example Action POST:\n'))
+            contents.append(_('Example Action POST:') + '\n')
             contents.append(example)
 
         return '\n'.join(contents) + '\n'

@@ -5,7 +5,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
-"POT-Creation-Date: 2020-09-25 10:53-0700\n"
+"POT-Creation-Date: 2020-09-25 11:46-0700\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -331,7 +331,7 @@ msgstr ""
 msgid "enum"
 msgstr ""
 
-#: doc_formatter/html_generator.py:621
+#: doc_formatter/html_generator.py:621 doc_formatter/markdown_generator.py:466
 msgid "Example Action POST:"
 msgstr ""
 
@@ -407,11 +407,6 @@ msgstr ""
 
 #: doc_formatter/markdown_generator.py:436
 msgid "(deprecated in v%(deprecated_version)s and later.)"
-msgstr ""
-
-#: doc_formatter/markdown_generator.py:466
-msgid ""
-"Example Action POST:\n"
 msgstr ""
 
 #: doc_formatter/markdown_generator.py:529
