@@ -3,9 +3,9 @@
 # License: BSD 3-Clause License. For full text see link: https://github.com/DMTF/Redfish-Tools/blob/master/LICENSE.md
 
 """
-File: test_version_order.py
+File: test_localized_schemas.py
 
-Brief: test(s) for detection and use of "locale" specified in config.
+Brief: test(s) for detection and use of localized schemas.
 """
 
 import os
@@ -15,7 +15,7 @@ from unittest.mock import patch
 import pytest
 from doc_generator import DocGenerator
 
-testcase_path = os.path.join('tests', 'samples', 'generate_docs_cases', 'general', 'input')
+testcase_path = os.path.join('tests', 'samples', 'localized_schemas', 'general', 'input')
 
 base_config = {
     'excluded_by_match': ['@odata.count', '@odata.navigationLink'],
@@ -32,8 +32,9 @@ base_config = {
     'output_format': 'markdown',
 }
 
+# TODO: this is non-normative output. Also add a normative version.
 @patch('urllib.request') # so we don't make HTTP requests. NB: samples should not call for outside resources.
-def test_locale_default(mockRequest):
+def test_localized_schemas_default(mockRequest):
     """ Verify a few expected strings are output in the default way when no locale is specified.
     """
 
@@ -48,15 +49,21 @@ def test_locale_default(mockRequest):
     files_to_process = docGen.get_files(docGen.import_from)
     output = docGen.generate_docs()
 
-    expected_strings = ['*read-only*', '*read-write<br>(null)*',
-                            '*For the possible property values, see WWNSource in Property details.*']
-
+    expected_strings = [
+        'The ComputerSystem schema represents a computer or system instance',
+        'The BootOptionReference of the Boot Option to perform a one-time boot from when BootSourceOverrideTarget is `UefiBootNext`.',
+        'The name of the boot order property that the system uses for the persistent boot order. *For the possible property values, see BootOrderPropertySelection in Property details.*',
+        '| AliasBootOrder | The system uses the AliasBootOrder property to specify the persistent boot order. |',
+        ]
+        # TODO: add some tests of the annotations.
     for x in expected_strings:
         assert x in output
 
 
+
+
 @patch('urllib.request') # so we don't make HTTP requests. NB: samples should not call for outside resources.
-def test_locale_en(mockRequest):
+def test_localized_schemas_en(mockRequest):
     """ Verify that our same test strings are output the same way when "en" is specified explicitly.
     """
 
@@ -72,15 +79,20 @@ def test_locale_en(mockRequest):
     files_to_process = docGen.get_files(docGen.import_from)
     output = docGen.generate_docs()
 
-    expected_strings = ['*read-only*', '*read-write<br>(null)*',
-                            '*For the possible property values, see WWNSource in Property details.*']
+    expected_strings = [
+        'The ComputerSystem schema represents a computer or system instance',
+        'The BootOptionReference of the Boot Option to perform a one-time boot from when BootSourceOverrideTarget is `UefiBootNext`.',
+        'The name of the boot order property that the system uses for the persistent boot order. *For the possible property values, see BootOrderPropertySelection in Property details.*',
+        '| AliasBootOrder | The system uses the AliasBootOrder property to specify the persistent boot order. |',
+        ]
+        # TODO: add some tests of the annotations.
 
     for x in expected_strings:
         assert x in output
 
 
 @patch('urllib.request') # so we don't make HTTP requests. NB: samples should not call for outside resources.
-def test_locale_TEST(mockRequest):
+def test_localized_schemas_TEST(mockRequest):
     """ Verify that the test strings are output correctly when TEST is specified for the locale.
     """
 
@@ -96,8 +108,8 @@ def test_locale_TEST(mockRequest):
     files_to_process = docGen.get_files(docGen.import_from)
     output = docGen.generate_docs()
 
-    expected_strings = ['*READ-ONLY*', '*READ-WRITE<br>(NULL)*',
-                            '*FOR THE POSSIBLE PROPERTY VALUES, SEE WWNSource IN PROPERTY DETAILS.*']
+    expected_strings = []
 
     for x in expected_strings:
         assert x in output
+    assert False
