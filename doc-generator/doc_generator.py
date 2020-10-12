@@ -329,17 +329,20 @@ class DocGenerator:
     def get_files(text_input):
         """From text input (command line or parsed from file), create a list of files. """
         files_to_process = []
+
         for file_to_import in text_input:
+            start_count = len(files_to_process)
             if os.path.isdir(file_to_import):
-                for root, _skip, files in os.walk(file_to_import):
-                    # NB: this is an adequate sort for file-grouping purposes. It's not guaranteed to sort versions correctly.
-                    files.sort(key=str.lower)
-                    for filename in files:
-                        if filename[-4:] == 'json':
-                            files_to_process.append(os.path.join(root, filename))
+                for dir_entry in os.scandir(file_to_import):
+                    if dir_entry.is_file():
+                        if dir_entry.path[-4:] == 'json':
+                            files_to_process.append(dir_entry.path)
+
+                # NB: this is an adequate sort for file-grouping purposes. It's not guaranteed to sort versions correctly.
+                files_to_process.sort(key=str.lower)
             elif os.path.isfile(file_to_import):
-                files_to_process.append(file_to_import)
-            else:
+                files_to_process.append(os.path.abspath(file_to_import))
+            if len(files_to_process) == start_count:
                 warnings.warn('Oops, %(filename)s not found, or contains no .json files.' % {'filename': file_to_import} + "\n")
         return files_to_process
 
