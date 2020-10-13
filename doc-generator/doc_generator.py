@@ -381,9 +381,16 @@ class DocGenerator:
             latest_data['_is_collection_of'] = latest_info.get('_is_collection_of')
             latest_data['_schema_name'] = latest_info.get('schema_name')
 
+            if self.config.get('locale'):
+                translated_file = os.path.join(latest_info['root'], self.config.get('locale'), latest_info['filename'])
+                if os.path.isfile(translated_file):
+                    translated_data = DocGenUtilities.load_as_json(translated_file)
+                    latest_data = self.apply_translated_data(latest_data, translated_data)
+
             # If we have data in the unversioned file, we need to overlay that.
             # We did this the same way for property_data. (Simplify?)
             latest_data = self.apply_unversioned_data_file(normalized_uri, latest_data)
+
             schema_data[normalized_uri] = latest_data
 
         # Also process and version definitions in any "other" files. These are files without top-level $ref objects.
@@ -707,6 +714,15 @@ class DocGenerator:
         if 'definitions' not in data:
             return property_data
 
+
+        # Look for a localized schema file and apply it first, if found.
+        if self.config.get('locale'):
+            (path_head, path_tail) = os.path.split(filename)
+            translated_file = os.path.join(path_head, self.config.get('locale'), path_tail)
+            if os.path.isfile(translated_file):
+                translated_data = DocGenUtilities.load_as_json(translated_file)
+                data = self.apply_translated_data(data, translated_data)
+
         ref = data.get('$ref', '')
         element_to_skip = False
 
@@ -731,6 +747,47 @@ class DocGenerator:
             property_data['definitions'][prop_name] = prop_info
 
         return property_data
+
+
+    def apply_translated_data(self, data, translated_data):
+        """ Gather translated strings from translated_data and apply them to data.
+        This assumes that translated_data is essentially a copy of data with translations
+        and annotations applied -- this is done on a file-by-file basis.
+        """
+
+        # If there is no definitions block, there's nothing to do:
+        if 'definitions' not in translated_data or 'definitions' not in data:
+            return data
+
+        definitions = translated_data['definitions']
+        for prop_name, prop_info in definitions.items():
+            if prop_name in data['definitions']:
+                prop_data = data['definitions'].get(prop_name)
+                data['definitions'][prop_name] = self.apply_translation_to_prop(prop_data, prop_info)
+
+        return data
+
+
+    def apply_translation_to_prop(self, data, translated_data):
+        """ Apply translated strings and annotations on a per-property basis.
+        Recurses through properties, etc. Does not follow $refs; this is intended to "overlay"
+        data from a translated schema onto the original. """
+
+        for x in ['description', 'longDescription']:
+            if translated_data.get(x):
+                data[x] = translated_data.get(x)
+
+        for x in ['enumDescriptions', 'enumLongDescriptions']:
+            if x in data and x in translated_data:
+                for y in data[x]:
+                    data[x][y] = translated_data.get(x, {}).get(y, data[x][y])
+
+        for prop_name, prop_info in data.get('properties', {}).items():
+            if translated_data.get(prop_name):
+                data[prop_name] = apply_translation_to_prop(data[prop_name], translated_data[prop_name])
+
+        return data
+
 
 
     def process_unversioned_files(self, schema_data, uri_to_local):
