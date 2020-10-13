@@ -622,10 +622,18 @@ class DocGenerator:
         profile = self.config.get('profile_resources', {})
 
         data = DocGenUtilities.load_as_json(filename)
+
+        # Check for a localized file and pull in translated text:
+        if self.config.get('locale'):
+            translated_file = os.path.join(ref['root'], self.config.get('locale'), ref['filename'])
+            if os.path.isfile(translated_file):
+                translated_data = DocGenUtilities.load_as_json(translated_file)
+                data = self.apply_translated_data(data, translated_data)
+
+
         schema_name = SchemaTraverser.find_schema_name(filename, data, True)
 
         version = self.get_version_string(ref['filename'])
-
 
         property_data['schema_name'] = schema_name
         property_data['name_and_version'] = schema_name
@@ -782,9 +790,11 @@ class DocGenerator:
                 for y in data[x]:
                     data[x][y] = translated_data.get(x, {}).get(y, data[x][y])
 
-        for prop_name, prop_info in data.get('properties', {}).items():
-            if translated_data.get(prop_name):
-                data[prop_name] = apply_translation_to_prop(data[prop_name], translated_data[prop_name])
+        if 'properties' in translated_data and 'properties' in data:
+            translated_properties = translated_data['properties']
+            for prop_name, prop_info in data['properties'].items():
+                if translated_properties.get(prop_name):
+                    data['properties'][prop_name] = self.apply_translation_to_prop(data['properties'][prop_name], translated_properties[prop_name])
 
         return data
 

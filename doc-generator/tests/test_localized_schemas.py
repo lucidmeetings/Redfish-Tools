@@ -62,58 +62,58 @@ def test_localized_schemas_default(mockRequest):
 
 
 
-# @patch('urllib.request') # so we don't make HTTP requests. NB: samples should not call for outside resources.
-# def test_localized_schemas_en(mockRequest):
-#     """ Verify that our same test strings are output the same way when "en" is specified explicitly.
-#     """
+@patch('urllib.request') # so we don't make HTTP requests. NB: samples should not call for outside resources.
+def test_localized_schemas_TEST(mockRequest):
+    """ Verify that the test strings are output correctly when TEST is specified for the locale.
+    """
 
-#     config = copy.deepcopy(base_config)
-#     config['locale'] = 'en'
-#     input_dir = os.path.abspath(testcase_path)
+    config = copy.deepcopy(base_config)
+    config['locale'] = 'TEST'
+    input_dir = os.path.abspath(testcase_path)
 
-#     config['uri_to_local'] = {'redfish.dmtf.org/schemas/v1': input_dir}
-#     config['local_to_uri'] = {input_dir : 'redfish.dmtf.org/schemas/v1'}
+    config['uri_to_local'] = {'redfish.dmtf.org/schemas/v1': input_dir}
+    config['local_to_uri'] = {input_dir : 'redfish.dmtf.org/schemas/v1'}
 
-#     docGen = DocGenerator([ input_dir ], '/dev/null', config)
+    docGen = DocGenerator([ input_dir ], '/dev/null', config)
 
-#     files_to_process = docGen.get_files(docGen.import_from)
-#     output = docGen.generate_docs()
+    files_to_process = docGen.get_files(docGen.import_from)
+    output = docGen.generate_docs()
 
-#     expected_strings = [
-#         'The ComputerSystem schema represents a computer or system instance',
-#         'The BootOptionReference of the Boot Option to perform a one-time boot from when BootSourceOverrideTarget is `UefiBootNext`.',
-#         'The name of the boot order property that the system uses for the persistent boot order. *For the possible property values, see BootOrderPropertySelection in Property details.*',
-#         '| AliasBootOrder | The system uses the AliasBootOrder property to specify the persistent boot order. |',
-#         ]
-#         # TODO: add some tests of the annotations.
+    expected_strings = [
+        'THE COMPUTERSYSTEM SCHEMA REPRESENTS A COMPUTER OR SYSTEM INSTANCE',
+        'THE BOOTOPTIONREFERENCE OF THE BOOT OPTION TO PERFORM A ONE-TIME BOOT FROM WHEN BOOTSOURCEOVERRIDETARGET IS `UEFIBOOTNEXT`.',
+        'THE NAME OF THE BOOT ORDER PROPERTY THAT THE SYSTEM USES FOR THE PERSISTENT BOOT ORDER. *FOR THE POSSIBLE PROPERTY VALUES, SEE BootOrderPropertySelection IN PROPERTY DETAILS.*',
+        '| AliasBootOrder | THE SYSTEM USES THE ALIASBOOTORDER PROPERTY TO SPECIFY THE PERSISTENT BOOT ORDER. |',
+        ]
 
-#     for x in expected_strings:
-#         assert x in output
+    for x in expected_strings:
+        assert x in output
 
 
-# @patch('urllib.request') # so we don't make HTTP requests. NB: samples should not call for outside resources.
-# def test_localized_schemas_TEST(mockRequest):
-#     """ Verify that the test strings are output correctly when TEST is specified for the locale.
-#     """
+@patch('urllib.request') # so we don't make HTTP requests. NB: samples should not call for outside resources.
+def test_localized_schemas_en(mockRequest):
+    """ Verify that our same test strings are output the same way when "en" is specified explicitly.
+    """
 
-#     config = copy.deepcopy(base_config)
-#     config['locale'] = 'TEST'
-#     input_dir = os.path.abspath(testcase_path)
+    config = copy.deepcopy(base_config)
+    config['locale'] = 'en'
+    input_dir = os.path.abspath(testcase_path)
 
-#     config['uri_to_local'] = {'redfish.dmtf.org/schemas/v1': input_dir}
-#     config['local_to_uri'] = {input_dir : 'redfish.dmtf.org/schemas/v1'}
+    config['uri_to_local'] = {'redfish.dmtf.org/schemas/v1': input_dir}
+    config['local_to_uri'] = {input_dir : 'redfish.dmtf.org/schemas/v1'}
 
-#     docGen = DocGenerator([ input_dir ], '/dev/null', config)
+    docGen = DocGenerator([ input_dir ], '/dev/null', config)
 
-#     files_to_process = docGen.get_files(docGen.import_from)
-#     output = docGen.generate_docs()
+    files_to_process = docGen.get_files(docGen.import_from)
+    output = docGen.generate_docs()
 
-#     expected_strings = [
-#         'THE COMPUTERSYSTEM SCHEMA REPRESENTS A COMPUTER OR SYSTEM INSTANCE',
-#         'THE BOOTOPTIONREFERENCE OF THE BOOT OPTION TO PERFORM A ONE-TIME BOOT FROM WHEN BOOTSOURCEOVERRIDETARGET IS `UEFIBOOTNEXT`.',
-#         'THE NAME OF THE BOOT ORDER PROPERTY THAT THE SYSTEM USES FOR THE PERSISTENT BOOT ORDER. *FOR THE POSSIBLE PROPERTY VALUES, SEE BootOrderPropertySelection IN PROPERTY DETAILS.*',
-#         '| AliasBootOrder | THE SYSTEM USES THE ALIASBOOTORDER PROPERTY TO SPECIFY THE PERSISTENT BOOT ORDER. |',
-#         ]
+    expected_strings = [
+        'The ComputerSystem schema represents a computer or system instance',
+        'The BootOptionReference of the Boot Option to perform a one-time boot from when BootSourceOverrideTarget is `UefiBootNext`.',
+        'The name of the boot order property that the system uses for the persistent boot order. *For the possible property values, see BootOrderPropertySelection in Property details.*',
+        '| AliasBootOrder | The system uses the AliasBootOrder property to specify the persistent boot order. |',
+        ]
+        # TODO: add some tests of the annotations.
 
-#     for x in expected_strings:
-#         assert x in output
+    for x in expected_strings:
+        assert x in output
