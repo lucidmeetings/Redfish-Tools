@@ -462,6 +462,8 @@ pre.code{
         if supplemental_details:
             contents.append(self.formatter.markdown_to_html(supplemental_details))
 
+        enum_translations = parent_prop_info.get('enumTranslations', {})
+
         if enum_details:
             headings = [prop_type, _('Description')]
             if profile_mode and profile_mode != 'subset':
@@ -472,6 +474,7 @@ pre.code{
 
             for enum_item in enum:
                 enum_name = html.escape(enum_item, False)
+                enum_translation = enum_translations.get(enum_item)
                 version = version_depr = deprecated_descr = None
                 version_display = None
                 if parent_prop_info.get('enumVersionAdded'):
@@ -484,6 +487,9 @@ pre.code{
                         version_depr = self.format_version(version_deprecated)
                 if parent_prop_info.get('enumDeprecated'):
                     deprecated_descr = parent_prop_info.get('enumDeprecated').get(enum_name)
+
+                if enum_translation:
+                    enum_name += ' (' + enum_translation + ')'
 
                 if version:
                     if not parent_version or DocGenUtilities.compare_versions(version, parent_version) > 0:
@@ -521,13 +527,13 @@ pre.code{
                 cells = [enum_name, descr]
 
                 if profile_mode and profile_mode != 'subset':
-                    if enum_name in profile_values:
+                    if enum_item in profile_values:
                         cells.append(self.text_map('Mandatory'))
-                    elif enum_name in profile_min_support_values:
+                    elif enum_item in profile_min_support_values:
                         cells.append(self.text_map('Mandatory'))
-                    elif enum_name in profile_parameter_values:
+                    elif enum_item in profile_parameter_values:
                         cells.append(self.text_map('Mandatory'))
-                    elif enum_name in profile_recommended_values:
+                    elif enum_item in profile_recommended_values:
                         cells.append(self.text_map('Recommended'))
                     else:
                         cells.append('')

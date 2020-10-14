@@ -33,6 +33,7 @@ base_config = {
 }
 
 # TODO: this is non-normative output. Also add a normative version.
+@pytest.mark.skip(reason="debugging")
 @patch('urllib.request') # so we don't make HTTP requests. NB: samples should not call for outside resources.
 def test_localized_schemas_default(mockRequest):
     """ Verify a few expected strings are output in the default way when no locale is specified.
@@ -50,15 +51,17 @@ def test_localized_schemas_default(mockRequest):
     output = docGen.generate_docs()
 
     expected_strings = [
+        # Descriptions
         'The ComputerSystem schema represents a computer or system instance',
         'The BootOptionReference of the Boot Option to perform a one-time boot from when BootSourceOverrideTarget is `UefiBootNext`.',
         'The name of the boot order property that the system uses for the persistent boot order. *For the possible property values, see BootOrderPropertySelection in Property details.*',
         '| AliasBootOrder | The system uses the AliasBootOrder property to specify the persistent boot order. |',
+        # enum that is annotated in the TEST locale (but not here):
+        '| Continuous |',
         ]
-        # TODO: add some tests of the annotations.
+
     for x in expected_strings:
         assert x in output
-
 
 
 
@@ -80,16 +83,21 @@ def test_localized_schemas_TEST(mockRequest):
     output = docGen.generate_docs()
 
     expected_strings = [
+        # Examples of descriptions:
         'THE COMPUTERSYSTEM SCHEMA REPRESENTS A COMPUTER OR SYSTEM INSTANCE',
         'THE BOOTOPTIONREFERENCE OF THE BOOT OPTION TO PERFORM A ONE-TIME BOOT FROM WHEN BOOTSOURCEOVERRIDETARGET IS `UEFIBOOTNEXT`.',
         'THE NAME OF THE BOOT ORDER PROPERTY THAT THE SYSTEM USES FOR THE PERSISTENT BOOT ORDER. *FOR THE POSSIBLE PROPERTY VALUES, SEE BootOrderPropertySelection IN PROPERTY DETAILS.*',
         '| AliasBootOrder | THE SYSTEM USES THE ALIASBOOTORDER PROPERTY TO SPECIFY THE PERSISTENT BOOT ORDER. |',
+        # Example of enumTranslations:
+        '| Continuous (CONTINUOUS) |',
         ]
 
     for x in expected_strings:
         assert x in output
 
 
+
+@pytest.mark.skip(reason="debugging")
 @patch('urllib.request') # so we don't make HTTP requests. NB: samples should not call for outside resources.
 def test_localized_schemas_en(mockRequest):
     """ Verify that our same test strings are output the same way when "en" is specified explicitly.
@@ -108,12 +116,46 @@ def test_localized_schemas_en(mockRequest):
     output = docGen.generate_docs()
 
     expected_strings = [
+        # descriptions
         'The ComputerSystem schema represents a computer or system instance',
         'The BootOptionReference of the Boot Option to perform a one-time boot from when BootSourceOverrideTarget is `UefiBootNext`.',
         'The name of the boot order property that the system uses for the persistent boot order. *For the possible property values, see BootOrderPropertySelection in Property details.*',
         '| AliasBootOrder | The system uses the AliasBootOrder property to specify the persistent boot order. |',
+        # enum that is annotated in the TEST locale (but not here):
+        '| Continuous |',
         ]
-        # TODO: add some tests of the annotations.
+
+    for x in expected_strings:
+        assert x in output
+
+
+@patch('urllib.request') # so we don't make HTTP requests. NB: samples should not call for outside resources.
+def test_localized_schemas_TEST_htmlmode(mockRequest):
+    """ Verify that the test strings are output correctly when TEST is specified for the locale, in HTML output mode.
+    """
+
+    config = copy.deepcopy(base_config)
+    config['locale'] = 'TEST'
+    config['output_format'] = 'html'
+    input_dir = os.path.abspath(testcase_path)
+
+    config['uri_to_local'] = {'redfish.dmtf.org/schemas/v1': input_dir}
+    config['local_to_uri'] = {input_dir : 'redfish.dmtf.org/schemas/v1'}
+
+    docGen = DocGenerator([ input_dir ], '/dev/null', config)
+
+    files_to_process = docGen.get_files(docGen.import_from)
+    output = docGen.generate_docs()
+
+    expected_strings = [
+        # Examples of descriptions:
+        'THE COMPUTERSYSTEM SCHEMA REPRESENTS A COMPUTER OR SYSTEM INSTANCE',
+        'THE BOOTOPTIONREFERENCE OF THE BOOT OPTION TO PERFORM A ONE-TIME BOOT FROM WHEN BOOTSOURCEOVERRIDETARGET IS <code>UEFIBOOTNEXT</code>.',
+        'THE NAME OF THE BOOT ORDER PROPERTY THAT THE SYSTEM USES FOR THE PERSISTENT BOOT ORDER.<br><i>FOR THE POSSIBLE PROPERTY VALUES, SEE <a href="#redfish.dmtf.org/schemas/v1/ComputerSystem.json|details|BootOrderPropertySelection">BootOrderPropertySelection</a> IN PROPERTY DETAILS.',
+        '<td>AliasBootOrder</td><td>THE SYSTEM USES THE ALIASBOOTORDER PROPERTY TO SPECIFY THE PERSISTENT BOOT ORDER.</td>',
+        # Example of enumTranslations:
+        '<td>Continuous (CONTINUOUS)</td>',
+        ]
 
     for x in expected_strings:
         assert x in output

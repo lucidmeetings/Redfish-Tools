@@ -790,6 +790,10 @@ class DocGenerator:
                 for y in data[x]:
                     data[x][y] = translated_data.get(x, {}).get(y, data[x][y])
 
+        # enumTranslations are additional annotations we need to add during output.
+        if 'enumTranslations' in translated_data:
+            data['enumTranslations'] = translated_data['enumTranslations']
+
         if 'properties' in translated_data and 'properties' in data:
             translated_properties = translated_data['properties']
             for prop_name, prop_info in data['properties'].items():
