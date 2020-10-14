@@ -33,7 +33,7 @@ base_config = {
 }
 
 # TODO: this is non-normative output. Also add a normative version.
-@pytest.mark.skip(reason="debugging")
+# TODO: add a test for translation of an action parameter. (e.g., ResetType)
 @patch('urllib.request') # so we don't make HTTP requests. NB: samples should not call for outside resources.
 def test_localized_schemas_default(mockRequest):
     """ Verify a few expected strings are output in the default way when no locale is specified.
@@ -58,6 +58,8 @@ def test_localized_schemas_default(mockRequest):
         '| AliasBootOrder | The system uses the AliasBootOrder property to specify the persistent boot order. |',
         # enum that is annotated in the TEST locale (but not here):
         '| Continuous |',
+        # property name that is annotated in the TEST locale (but not here):
+        '| **AssetTag** |',
         ]
 
     for x in expected_strings:
@@ -90,14 +92,14 @@ def test_localized_schemas_TEST(mockRequest):
         '| AliasBootOrder | THE SYSTEM USES THE ALIASBOOTORDER PROPERTY TO SPECIFY THE PERSISTENT BOOT ORDER. |',
         # Example of enumTranslations:
         '| Continuous (CONTINUOUS) |',
+        # property name with a translation annotation:
+        '| **AssetTag** *(Its Mine)* |',
         ]
 
     for x in expected_strings:
         assert x in output
 
 
-
-@pytest.mark.skip(reason="debugging")
 @patch('urllib.request') # so we don't make HTTP requests. NB: samples should not call for outside resources.
 def test_localized_schemas_en(mockRequest):
     """ Verify that our same test strings are output the same way when "en" is specified explicitly.
@@ -123,6 +125,8 @@ def test_localized_schemas_en(mockRequest):
         '| AliasBootOrder | The system uses the AliasBootOrder property to specify the persistent boot order. |',
         # enum that is annotated in the TEST locale (but not here):
         '| Continuous |',
+        # property name that is annotated in the TEST locale (but not here):
+        '| **AssetTag** |',
         ]
 
     for x in expected_strings:
@@ -155,6 +159,8 @@ def test_localized_schemas_TEST_htmlmode(mockRequest):
         '<td>AliasBootOrder</td><td>THE SYSTEM USES THE ALIASBOOTORDER PROPERTY TO SPECIFY THE PERSISTENT BOOT ORDER.</td>',
         # Example of enumTranslations:
         '<td>Continuous (CONTINUOUS)</td>',
+        # property name with a translation annotation:
+        '<td><nobr><b>AssetTag</b> <i>(Its Mine)</i></nobr></td>',
         ]
 
     for x in expected_strings:

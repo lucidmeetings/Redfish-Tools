@@ -80,11 +80,13 @@ class MarkdownGenerator(DocFormatter):
         if isinstance(prop_info, list):
             has_enum = 'enum' in prop_info[0]
             is_excerpt = prop_info[0].get('_is_excerpt') or prop_info[0].get('excerptCopy')
+            translated_name = prop_info[0].get('translation')
             if 'format' in prop_info[0]:
                 format_annotation = prop_info[0]['format']
         elif isinstance(prop_info, dict):
             has_enum = 'enum' in prop_info
             is_excerpt = prop_info.get('_is_excerpt')
+            translated_name = prop_info.get('translation')
             if 'format' in prop_info:
                 format_annotation = prop_info['format']
 
@@ -95,6 +97,9 @@ class MarkdownGenerator(DocFormatter):
         if prop_name:
             name_and_version = self.formatter.bold(self.escape_for_markdown(prop_name,
                                                                   self.config.get('escape_chars', [])))
+            if translated_name:
+                name_and_version += ' ' + self.formatter.italic(self.escape_for_markdown('(' + translated_name + ')',
+                                                                    self.config.get('escape_chars', [])))
         else:
             name_and_version = ''
 

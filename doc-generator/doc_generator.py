@@ -781,7 +781,7 @@ class DocGenerator:
         Recurses through properties, etc. Does not follow $refs; this is intended to "overlay"
         data from a translated schema onto the original. """
 
-        for x in ['description', 'longDescription']:
+        for x in ['description', 'longDescription', 'translation']:
             if translated_data.get(x):
                 data[x] = translated_data.get(x)
 

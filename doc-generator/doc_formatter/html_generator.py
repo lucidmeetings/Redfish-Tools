@@ -206,11 +206,13 @@ pre.code{
         if isinstance(prop_info, list):
             has_enum = 'enum' in prop_info[0]
             is_excerpt = prop_info[0].get('_is_excerpt') or prop_info[0].get('excerptCopy')
+            translated_name = prop_info[0].get('translation')
             if 'format' in prop_info[0]:
                 format_annotation = prop_info[0]['format']
         elif isinstance(prop_info, dict):
             has_enum = 'enum' in prop_info
             is_excerpt = prop_info.get('_is_excerpt')
+            translated_name = prop_info.get('translation')
             if 'format' in prop_info:
                 format_annotation = prop_info['format']
 
@@ -218,6 +220,9 @@ pre.code{
 
         version_strings = self.format_version_strings(prop_info)
         name_and_version = self.formatter.bold(html.escape(prop_name, False))
+
+        if translated_name:
+            name_and_version += ' ' + self.formatter.italic('(' + translated_name + ')')
 
         if version_strings['version_string']:
             name_and_version += ' ' + self.formatter.italic(version_strings['version_string'])
