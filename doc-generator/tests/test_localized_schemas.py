@@ -33,7 +33,6 @@ base_config = {
 }
 
 # TODO: this is non-normative output. Also add a normative version.
-# TODO: add a test for translation of an action parameter. (e.g., ResetType)
 @patch('urllib.request') # so we don't make HTTP requests. NB: samples should not call for outside resources.
 def test_localized_schemas_default(mockRequest):
     """ Verify a few expected strings are output in the default way when no locale is specified.
@@ -60,6 +59,8 @@ def test_localized_schemas_default(mockRequest):
         '| Continuous |',
         # property name that is annotated in the TEST locale (but not here):
         '| **AssetTag** |',
+        # Action parameter that is annotated in the TEST locale (but not here):
+        '**ResetType** |',
         ]
 
     for x in expected_strings:
@@ -94,6 +95,8 @@ def test_localized_schemas_TEST(mockRequest):
         '| Continuous (CONTINUOUS) |',
         # property name with a translation annotation:
         '| **AssetTag** *(Its Mine)* |',
+        # Action parameter with a translation annotation:
+        '**ResetType** *(YOU WANNA RESET THIS THING)* |',
         ]
 
     for x in expected_strings:
@@ -127,6 +130,8 @@ def test_localized_schemas_en(mockRequest):
         '| Continuous |',
         # property name that is annotated in the TEST locale (but not here):
         '| **AssetTag** |',
+        # Action parameter that is annotated in the TEST locale (but not here):
+        '**ResetType** |',
         ]
 
     for x in expected_strings:
@@ -161,6 +166,8 @@ def test_localized_schemas_TEST_htmlmode(mockRequest):
         '<td>Continuous (CONTINUOUS)</td>',
         # property name with a translation annotation:
         '<td><nobr><b>AssetTag</b> <i>(Its Mine)</i></nobr></td>',
+        # Action parameter with a translation annotation:
+        '<nobr><b>ResetType</b> <i>(YOU WANNA RESET THIS THING)</i></nobr>',
         ]
 
     for x in expected_strings:

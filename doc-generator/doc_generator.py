@@ -794,11 +794,12 @@ class DocGenerator:
         if 'enumTranslations' in translated_data:
             data['enumTranslations'] = translated_data['enumTranslations']
 
-        if 'properties' in translated_data and 'properties' in data:
-            translated_properties = translated_data['properties']
-            for prop_name, prop_info in data['properties'].items():
-                if translated_properties.get(prop_name):
-                    data['properties'][prop_name] = self.apply_translation_to_prop(data['properties'][prop_name], translated_properties[prop_name])
+        for x in ['properties', 'parameters']:
+            if x in translated_data and x in data:
+                translated_properties = translated_data[x]
+                for prop_name, prop_info in data[x].items():
+                    if translated_properties.get(prop_name):
+                        data[x][prop_name] = self.apply_translation_to_prop(data[x][prop_name], translated_properties[prop_name])
 
         return data
 

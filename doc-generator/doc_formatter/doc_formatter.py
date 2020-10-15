@@ -93,7 +93,8 @@ class DocFormatter:
         self.parent_props = [
             'description', 'longDescription', 'verbatim_description', 'fulldescription_override', 'pattern',
             'readonly', 'prop_required', 'prop_required_on_create', 'requiredParameter', 'required_parameter',
-            'versionAdded', 'versionDeprecated', 'deprecated', 'enumVersionAdded', 'enumVersionDeprecated', 'enumDeprecated'
+            'versionAdded', 'versionDeprecated', 'deprecated', 'enumVersionAdded', 'enumVersionDeprecated', 'enumDeprecated',
+            'translation'
             ]
 
 
@@ -903,6 +904,7 @@ class DocFormatter:
                         wants_common_objects = self.config.get('wants_common_objects')
                         ref_description = ref_info.get('description')
                         ref_longDescription = ref_info.get('longDescription')
+                        ref_translation = ref_info.get('translation')
                         ref_fulldescription_override = ref_info.get('fulldescription_override')
                         ref_pattern = ref_info.get('pattern')
                         link_detail = ''
@@ -970,7 +972,11 @@ class DocFormatter:
                                 '_ref_longDescription': ref_longDescription
                                 }
 
-                            props_to_add = ['_prop_name', '_from_schema_ref', '_schema_name', 'type', 'readonly', '_ref_description', '_ref_longDescription']
+                            if ref_translation: # Don't even set this parameter if it's null/empty.
+                                new_ref_info['translation'] = ref_translation
+                                new_ref_info['_ref_translation'] = ref_translation
+
+                            props_to_add = ['_prop_name', '_from_schema_ref', '_schema_name', 'type', 'readonly', '_ref_description', '_ref_longDescription', '_ref_translation']
                             for x in props_to_add:
                                 if ref_info.get(x):
                                     new_ref_info[x] = ref_info[x]
