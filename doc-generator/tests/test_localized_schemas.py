@@ -32,7 +32,6 @@ base_config = {
     'output_format': 'markdown',
 }
 
-# TODO: this is non-normative output. Also add a normative version.
 @patch('urllib.request') # so we don't make HTTP requests. NB: samples should not call for outside resources.
 def test_localized_schemas_default(mockRequest):
     """ Verify a few expected strings are output in the default way when no locale is specified.
@@ -54,6 +53,42 @@ def test_localized_schemas_default(mockRequest):
         'The ComputerSystem schema represents a computer or system instance',
         'The BootOptionReference of the Boot Option to perform a one-time boot from when BootSourceOverrideTarget is `UefiBootNext`.',
         'The name of the boot order property that the system uses for the persistent boot order. *For the possible property values, see BootOrderPropertySelection in Property details.*',
+        '| AliasBootOrder | The system uses the AliasBootOrder property to specify the persistent boot order. |',
+        # enum that is annotated in the TEST locale (but not here):
+        '| Continuous |',
+        # property name that is annotated in the TEST locale (but not here):
+        '| **AssetTag** |',
+        # Action parameter that is annotated in the TEST locale (but not here):
+        '**ResetType** |',
+        ]
+
+    for x in expected_strings:
+        assert x in output
+
+
+@patch('urllib.request') # so we don't make HTTP requests. NB: samples should not call for outside resources.
+def test_localized_schemas_normative_default(mockRequest):
+    """ Verify a few expected strings are output in the default way when no locale is specified.
+    Same as test_localized_schemas_default, but with normative output.
+    """
+
+    config = copy.deepcopy(base_config)
+    input_dir = os.path.abspath(testcase_path)
+
+    config['uri_to_local'] = {'redfish.dmtf.org/schemas/v1': input_dir}
+    config['local_to_uri'] = {input_dir : 'redfish.dmtf.org/schemas/v1'}
+    config['normative'] = True
+
+    docGen = DocGenerator([ input_dir ], '/dev/null', config)
+
+    files_to_process = docGen.get_files(docGen.import_from)
+    output = docGen.generate_docs()
+
+    expected_strings = [
+        # Descriptions
+        'This resource shall represent a computing system in the Redfish Specification.',
+        'This property shall contain the BootOptionReference of the UEFI boot option for one time boot, as defined by the UEFI Specification.  The valid values for this property are specified in the values of the BootOrder array.',
+        'This property shall indicate which boot order property the system uses for the persistent boot order. *For the possible property values, see BootOrderPropertySelection in Property details.*',
         '| AliasBootOrder | The system uses the AliasBootOrder property to specify the persistent boot order. |',
         # enum that is annotated in the TEST locale (but not here):
         '| Continuous |',
@@ -91,12 +126,37 @@ def test_localized_schemas_TEST(mockRequest):
         'THE BOOTOPTIONREFERENCE OF THE BOOT OPTION TO PERFORM A ONE-TIME BOOT FROM WHEN BOOTSOURCEOVERRIDETARGET IS `UEFIBOOTNEXT`.',
         'THE NAME OF THE BOOT ORDER PROPERTY THAT THE SYSTEM USES FOR THE PERSISTENT BOOT ORDER. *FOR THE POSSIBLE PROPERTY VALUES, SEE BootOrderPropertySelection IN PROPERTY DETAILS.*',
         '| AliasBootOrder | THE SYSTEM USES THE ALIASBOOTORDER PROPERTY TO SPECIFY THE PERSISTENT BOOT ORDER. |',
-        # Example of enumTranslations:
-        '| Continuous (CONTINUOUS) |',
-        # property name with a translation annotation:
-        '| **AssetTag** *(Its Mine)* |',
-        # Action parameter with a translation annotation:
-        '**ResetType** *(YOU WANNA RESET THIS THING)* |',
+        ]
+
+    for x in expected_strings:
+        assert x in output
+
+
+@patch('urllib.request') # so we don't make HTTP requests. NB: samples should not call for outside resources.
+def test_localized_schemas_normative_TEST(mockRequest):
+    """ Verify a few expected strings are output translated when TEST locale is specified.
+    Same as test_localized_schemas_TEST, but with normative output.
+    """
+
+    config = copy.deepcopy(base_config)
+    input_dir = os.path.abspath(testcase_path)
+
+    config['uri_to_local'] = {'redfish.dmtf.org/schemas/v1': input_dir}
+    config['local_to_uri'] = {input_dir : 'redfish.dmtf.org/schemas/v1'}
+    config['locale'] = 'TEST'
+    config['normative'] = True
+
+    docGen = DocGenerator([ input_dir ], '/dev/null', config)
+
+    files_to_process = docGen.get_files(docGen.import_from)
+    output = docGen.generate_docs()
+
+    expected_strings = [
+        # Descriptions
+        'THIS RESOURCE SHALL REPRESENT A COMPUTING SYSTEM IN THE REDFISH SPECIFICATION.',
+        'THIS PROPERTY SHALL CONTAIN THE BOOTOPTIONREFERENCE OF THE UEFI BOOT OPTION FOR ONE TIME BOOT, AS DEFINED BY THE UEFI SPECIFICATION.  THE VALID VALUES FOR THIS PROPERTY ARE SPECIFIED IN THE VALUES OF THE BOOTORDER ARRAY.',
+        'THIS PROPERTY SHALL INDICATE WHICH BOOT ORDER PROPERTY THE SYSTEM USES FOR THE PERSISTENT BOOT ORDER. *FOR THE POSSIBLE PROPERTY VALUES, SEE BootOrderPropertySelection IN PROPERTY DETAILS.*',
+        '| AliasBootOrder | THE SYSTEM USES THE ALIASBOOTORDER PROPERTY TO SPECIFY THE PERSISTENT BOOT ORDER. |',
         ]
 
     for x in expected_strings:
