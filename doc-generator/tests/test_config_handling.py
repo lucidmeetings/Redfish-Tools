@@ -1,5 +1,5 @@
 # Copyright Notice:
-# Copyright 2019 Distributed Management Task Force, Inc. All rights reserved.
+# Copyright 2019-2020 Distributed Management Task Force, Inc. All rights reserved.
 # License: BSD 3-Clause License. For full text see link: https://github.com/DMTF/Redfish-Tools/blob/master/LICENSE.md
 
 """
@@ -23,7 +23,7 @@ base_cli_args = {
     "config_file": "../Redfish-Tools/doc-generator/sample_inputs/config_for_standard_html.json",
     "import_from": ['/cli/path/to/schemas'],
     "normative": True,
-    "format": 'markdown',
+    "format": 'slate',
     "outfile": "cli_outfile_name.md",
     "supfile": "/cli/path/to/base_supp_file",
     "payload_dir": "/cli/path/to/payloads",
@@ -123,7 +123,7 @@ def test_config_defaults():
     cwd = os.getcwd()
 
     config = DocGenerator.combine_configs()
-    assert config['output_format'] == 'markdown'
+    assert config['output_format'] == 'slate'
     assert config['output_content'] == 'full_doc'
     assert config['outfile_name'] == 'output.md'
     assert config['cwd'] == cwd
@@ -257,5 +257,5 @@ def test_cli_overrides_config(mock_exit):
 
     assert config.get('import_from') == ['/cli/path/to/schemas']
     assert config.get('outfile_name') == 'cli_outfile_name.md'
-    assert config.get('output_format') == 'markdown'
+    assert config.get('output_format') == 'slate'
     assert config.get('escape_chars') == ['@', '#']
