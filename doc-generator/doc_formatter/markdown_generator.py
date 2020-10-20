@@ -30,8 +30,22 @@ class MarkdownGenerator(DocFormatter):
             'linebreak': '\n',
             'pattern': ', '
             }
+        self.markdown_mode = config.get('output_format', 'markdown')
         self.formatter = FormatUtils()
         self.layout_payloads = 'top'
+
+        # Add some functions we'll use to selectively promote headings when the output mode is slate.
+        self.format_section_head = self.formatter.head_two
+        if self.markdown_mode == 'slate':
+            self.format_section_head = self.formatter.head_one
+
+        self.format_head_three = self.formatter.head_three
+        if self.markdown_mode == 'slate':
+            self.format_head_three = self.formatter.head_two
+
+        self.format_head_four = self.formatter.head_four
+        if self.markdown_mode == 'slate':
+            self.format_head_four = self.formatter.head_three
 
 
     def format_property_row(self, schema_ref, prop_name, prop_info, prop_path=[], in_array=False, as_action_parameters=False):
@@ -469,7 +483,7 @@ class MarkdownGenerator(DocFormatter):
         """Generate a formatted Actions section from supplemental markup."""
 
         contents = []
-        contents.append(self.formatter.head_three(action_details.get('action_name', prop_name), self.level))
+        contents.append(self.format_head_four(action_details.get('action_name', prop_name), self.level))
         if action_details.get('text'):
             contents.append(action_details.get('text'))
         if action_details.get('example'):
@@ -626,18 +640,18 @@ class MarkdownGenerator(DocFormatter):
             if section.get('profile_conditional_details'):
                 # sort them now; these can be sub-properties so may not be in alpha order.
                 conditional_details = '\n'.join(sorted(section['profile_conditional_details'], key=str.lower))
-                contents.append('\n' + self.formatter.head_two('Conditional Requirements', self.level))
+                contents.append('\n' + self.format_head_three('Conditional Requirements', self.level))
                 contents.append(conditional_details)
 
             if len(section.get('action_details', [])):
-                contents.append('\n' + self.formatter.head_two('Actions', self.level))
+                contents.append('\n' + self.format_head_three('Actions', self.level))
                 contents.append('\n\n'.join(section.get('action_details')))
             if section.get('property_details'):
-                contents.append('\n' + self.formatter.head_two('Property details', self.level))
+                contents.append('\n' + self.format_head_three('Property details', self.level))
                 detail_names = [x for x in section['property_details'].keys()]
                 detail_names.sort(key=str.lower)
                 for detail_name in detail_names:
-                    contents.append(self.formatter.head_three(detail_name + ':', 0))
+                    contents.append(self.format_head_four(detail_name + ':', 0))
                     det_info = section['property_details'][detail_name]
                     if len(det_info) == 1:
                         for x in det_info.values():
@@ -665,7 +679,7 @@ class MarkdownGenerator(DocFormatter):
             if section.get('description'):
                 contents.append(self.formatter.para(section['description']))
             if section.get('messages'):
-                contents.append(self.formatter.head_two(_('Messages'), self.level))
+                contents.append(self.format_head_three(_('Messages'), self.level))
                 message_rows = [self.formatter.make_row(x) for x in section['messages']]
                 header_cells = ['', _('Requirement')]
                 if self.config.get('profile_mode') != 'terse':
@@ -771,7 +785,7 @@ search: true
     def add_section(self, text, link_id=False, schema_ref=False):
         """ Add a top-level heading """
         self.this_section = {'head': text,
-                             'heading': '\n' + self.formatter.head_one(text, self.level),
+                             'heading': '\n' + self.format_section_head(text, self.level),
                              'properties': [],
                              'property_details': {},
                              'schema_ref': '',
@@ -837,7 +851,7 @@ search: true
             if reg.get('current_release', reg['minversion']) != reg['minversion']:
                 heading += ' ' + (_('(current release: v%(version_number)s)') % {'version_number': reg['current_release']})
 
-            this_section['heading'] = self.formatter.head_one(heading, self.level)
+            this_section['heading'] = self.format_section_head(heading, self.level)
             this_section['requirement'] = _('Requirement: %(req)s') % {'req': reg.get('profile_requirement')}
 
             msgs = reg.get('Messages', {})
