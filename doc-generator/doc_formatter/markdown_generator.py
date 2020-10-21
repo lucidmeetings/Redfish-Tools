@@ -631,8 +631,9 @@ class MarkdownGenerator(DocFormatter):
                 contents.append(section['description'])
             if section.get('uris'):
                 contents.append(section['uris'])
-            if section.get('json_payload'):
+            if section.get('json_payload') and (self.markdown_mode == 'slate'): # If not slate, it goes at the end.:
                 contents.append(section['json_payload'])
+
             # something is awry if there are no properties, but ...
             if section.get('properties'):
                 contents.append('|     |     |     |')
@@ -671,6 +672,9 @@ class MarkdownGenerator(DocFormatter):
                             info = det_info[path_to_ref[path]]
                             contents.append(self.formatter.para(self.formatter.bold("In " + path + ":")))
                             contents.append(info['formatted_descr'])
+
+            if section.get('json_payload') and (self.markdown_mode != 'slate'): # Otherwise, this was inserted above.
+                contents.append(section['json_payload'])
 
         self.sections = []
 
