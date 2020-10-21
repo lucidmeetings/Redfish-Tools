@@ -404,7 +404,7 @@ class DocGenerator:
             self.generator = PropertyIndexGenerator(self.property_data, traverser, self.config, level)
             return self.generator.generate_output()
 
-        if self.config['output_format'] == 'slate':
+        if self.config['output_format'] in ['markdown', 'slate']:
             from doc_formatter import MarkdownGenerator
             self.generator = MarkdownGenerator(self.property_data, traverser, self.config, level)
         elif self.config['output_format'] == 'html':
@@ -1056,7 +1056,7 @@ class DocGenerator:
         parser.add_argument('-n', '--normative', action='store_true', dest='normative', default=None,
                             help='Produce normative (developer-focused) output')
         parser.add_argument('--format', dest='format',
-                            choices=['slate', 'html', 'csv'], help='Output format')
+                            choices=['markdown', 'slate', 'html', 'csv'], help='Output format')
         parser.add_argument('--out', dest='outfile',
                             help=('Output file (default depends on output format: '
                                   'output.md for Markdown, index.html for HTML, output.csv for CSV'))
@@ -1304,7 +1304,7 @@ class DocGenerator:
                     outfile_name += '.html'
                 if config['output_format'] == 'csv':
                     outfile_name += '.csv'
-                if config['output_format'] == 'slate':
+                if config['output_format'] in ['markdown', 'slate']:
                     outfile_name += '.md'
         config['outfile_name'] = outfile_name
 

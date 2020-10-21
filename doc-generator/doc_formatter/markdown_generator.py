@@ -30,7 +30,6 @@ class MarkdownGenerator(DocFormatter):
             'linebreak': '\n',
             'pattern': ', '
             }
-        self.markdown_mode = config.get('output_format', 'markdown')
         self.formatter = FormatUtils()
         self.layout_payloads = 'top'
 
@@ -515,7 +514,10 @@ class MarkdownGenerator(DocFormatter):
         if version_string:
             name_and_version += ' ' + self.formatter.italic(version_strings['version_string'])
 
-        formatted.append(self.formatter.head_four(name_and_version, self.level))
+        if self.markdown_mode == 'slate':
+            formatted.append(self.formatter.head_five(name_and_version, self.level))
+        else:
+            formatted.append(self.formatter.head_three(name_and_version, self.level))
         if deprecated_descr:
             formatted.append(self.formatter.para(italic(deprecated_descr)))
         formatted.append(self.formatter.para(prop_descr))
