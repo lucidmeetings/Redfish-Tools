@@ -23,7 +23,7 @@ base_cli_args = {
     "config_file": "../Redfish-Tools/doc-generator/sample_inputs/config_for_standard_html.json",
     "import_from": ['/cli/path/to/schemas'],
     "normative": True,
-    "format": 'slate',
+    "format": 'markdown',
     "outfile": "cli_outfile_name.md",
     "supfile": "/cli/path/to/base_supp_file",
     "payload_dir": "/cli/path/to/payloads",
@@ -257,5 +257,5 @@ def test_cli_overrides_config(mock_exit):
 
     assert config.get('import_from') == ['/cli/path/to/schemas']
     assert config.get('outfile_name') == 'cli_outfile_name.md'
-    assert config.get('output_format') == 'slate'
+    assert config.get('output_format') == 'markdown'
     assert config.get('escape_chars') == ['@', '#']
