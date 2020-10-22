@@ -34,9 +34,9 @@ class MarkdownGenerator(DocFormatter):
         self.layout_payloads = 'top'
 
         # Add some functions we'll use to selectively promote headings when the output mode is slate.
-        self.format_section_head = self.formatter.head_two
+        self.format_head_two = self.formatter.head_two
         if self.markdown_mode == 'slate':
-            self.format_section_head = self.formatter.head_one
+            self.format_head_two = self.formatter.head_one
 
         self.format_head_three = self.formatter.head_three
         if self.markdown_mode == 'slate':
@@ -518,6 +518,7 @@ class MarkdownGenerator(DocFormatter):
             formatted.append(self.formatter.head_five(name_and_version, self.level))
         else:
             formatted.append(self.formatter.head_three(name_and_version, self.level))
+
         if deprecated_descr:
             formatted.append(self.formatter.para(italic(deprecated_descr)))
         formatted.append(self.formatter.para(prop_descr))
@@ -670,7 +671,10 @@ class MarkdownGenerator(DocFormatter):
                         paths_sorted.sort(key=str.lower)
                         for path in paths_sorted:
                             info = det_info[path_to_ref[path]]
-                            contents.append(self.formatter.para(self.formatter.bold("In " + path + ":")))
+                            if self.markdown_mode == 'slate':
+                                contents.append(self.formatter.para(self.formatter.bold("In " + path + ":")))
+                            else:
+                                contents.append(self.formatter.head_five("In " + path + ":"))
                             contents.append(info['formatted_descr'])
 
             if section.get('json_payload') and (self.markdown_mode != 'slate'): # Otherwise, this was inserted above.
@@ -791,7 +795,7 @@ search: true
     def add_section(self, text, link_id=False, schema_ref=False):
         """ Add a top-level heading """
         self.this_section = {'head': text,
-                             'heading': '\n' + self.format_section_head(text, self.level),
+                             'heading': '\n' + self.format_head_two(text, self.level),
                              'properties': [],
                              'property_details': {},
                              'schema_ref': '',
@@ -857,7 +861,7 @@ search: true
             if reg.get('current_release', reg['minversion']) != reg['minversion']:
                 heading += ' ' + (_('(current release: v%(version_number)s)') % {'version_number': reg['current_release']})
 
-            this_section['heading'] = self.format_section_head(heading, self.level)
+            this_section['heading'] = self.format_head_two(heading, self.level)
             this_section['requirement'] = _('Requirement: %(req)s') % {'req': reg.get('profile_requirement')}
 
             msgs = reg.get('Messages', {})
