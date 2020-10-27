@@ -1451,7 +1451,7 @@ class DocFormatter:
             # Extend and parse parameter info
             for action_param in action_parameters.keys():
                 params = action_parameters[action_param]
-                params = self.extend_property_info(schema_ref, params, profile)
+                params = self.extend_property_info(schema_ref, params)
                 action_parameters[action_param] = params
 
             version_strings = self.format_version_strings(prop_info)
@@ -1460,7 +1460,7 @@ class DocFormatter:
 
             if prop_info.get('actionResponse'):
                 action_response = prop_info['actionResponse']
-                action_response_extended = self.extend_property_info(schema_ref, action_response, profile)
+                action_response_extended = self.extend_property_info(schema_ref, action_response)
                 action_response_formatted = self.format_action_response(schema_ref, prop_name, action_response_extended[0])
                 action_details += action_response_formatted
 
@@ -1813,16 +1813,15 @@ class DocFormatter:
         parent_requires = prop_info.get('parent_requires', [])
         parent_requires_on_create = prop_info.get('parent_requires_on_create', [])
 
-        prop_names = patterns = False
+        prop_names = patterns = profile = False
+        if len(prop_path) and prop_path[0] == 'Actions':
+            profile_section = 'ActionRequirements'
+        else:
+            profile_section = 'PropertyRequirements'
 
         if properties:
 
             prop_names = [x for x in properties.keys()]
-
-            if len(prop_path) and prop_path[0] == 'Actions':
-                profile_section = 'ActionRequirements'
-            else:
-                profile_section = 'PropertyRequirements'
 
             if self.config.get('profile_mode') == 'terse' or self.config.get('profile_mode') == 'subset':
 
