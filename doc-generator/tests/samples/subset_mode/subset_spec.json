@@ -10,7 +10,7 @@
 				"ChassisType": {
 					"Comparison": "AnyOf",
 					"Values": ["RackMount", "Drawer", "Shelf"]
-				},
+			},
 				"Id": {},
 				"IndicatorLED": {
 					"ReadRequirement": "Mandatory",
@@ -73,10 +73,7 @@
 				"SpeedMbps": {},
 				"Status": {
 	        			 "PropertyRequirements": {
-						"State": {},
-						"Health": {
-							"ReadRequirement" : "IfPopulated"
-						}
+						"State": {}
 					}
 				}
 			}
