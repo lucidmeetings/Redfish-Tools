@@ -257,7 +257,8 @@ class DocFormatter:
         raise NotImplementedError
 
 
-    def format_property_row(self, schema_ref, prop_name, prop_info, prop_path=[], in_array=False, as_action_parameters=False):
+    def format_property_row(self, schema_ref, prop_name, prop_info, prop_path=[], in_array=False, as_action_parameters=False,
+                                in_schema_ref=None):
         """Format information for a single property. Returns an object with 'row' and 'details'.
 
         'row': content for the main table being generated.
@@ -900,8 +901,6 @@ class DocFormatter:
                             ref_info = idref_info
                 ref_info = self.apply_overrides(ref_info)
 
-                # if prop_name == 'Status':
-                #     import pdb; pdb.set_trace()
                 if ref_info.get('type') == 'object':
                     # If this is an excerpt, it will also be an object, and we want to expand-in-place.
                     # The same applies (or should) if config explicitly says to include:
@@ -1804,8 +1803,9 @@ class DocFormatter:
         conditional_details = {}
 
         # If prop_info was extracted from a different schema, it will be present as _from_schema_ref
+        in_schema_ref = schema_ref
         schema_ref = prop_info.get('_from_schema_ref', schema_ref)
-        schema_name = self.traverser.get_schema_name(schema_ref)
+        in_schema_name = self.traverser.get_schema_name(in_schema_ref)
 
         required = prop_info.get('required', [])
         required_on_create = prop_info.get('requiredOnCreate', [])
@@ -1849,7 +1849,7 @@ class DocFormatter:
                 base_detail_info['prop_required'] = base_detail_info.get('prop_required') or prop_name in parent_requires
                 base_detail_info['prop_required_on_create'] = (base_detail_info.get('prop_required_on_create') or
                                                                    prop_name in parent_requires_on_create)
-                base_detail_info = self.apply_overrides(base_detail_info, schema_name, prop_name)
+                base_detail_info = self.apply_overrides(base_detail_info, in_schema_name, prop_name)
                 if profile:
                     base_detail_info['_profile'] = profile.get(profile_section, {}).get(prop_name)
                 detail_info = self.extend_property_info(schema_ref, base_detail_info)
@@ -1860,7 +1860,7 @@ class DocFormatter:
 
                 new_path = prop_path.copy()
 
-                formatted = self.format_property_row(schema_ref, prop_name, detail_info, new_path)
+                formatted = self.format_property_row(schema_ref, prop_name, detail_info, new_path, in_schema_ref=in_schema_ref)
                 if formatted:
                     output.append(formatted['row'])
                     if formatted['details']:
@@ -1882,7 +1882,7 @@ class DocFormatter:
                     base_pattern_info['prop_required'] = False
                     base_pattern_info['prop_required_on_create'] = False
 
-                    base_pattern_info = self.apply_overrides(base_pattern_info, schema_name, None)
+                    base_pattern_info = self.apply_overrides(base_pattern_info, in_schema_name, None)
 
                     # Override the description, if any, with a line describing the pattern.
                     description = _('Property names follow regular expression pattern "%(pattern)s"') % {'pattern': self.escape_regexp(pattern)}
@@ -1891,7 +1891,7 @@ class DocFormatter:
 
                     pattern_info = self.extend_property_info(schema_ref, base_pattern_info) # TODO: do we need a profile here?
 
-                    formatted = self.format_property_row(schema_ref, prop_name, pattern_info, prop_path)
+                    formatted = self.format_property_row(schema_ref, prop_name, pattern_info, prop_path, in_schema_ref=in_schema_ref)
                     if formatted:
                         output.append(formatted['row'])
                         if formatted['details']:
