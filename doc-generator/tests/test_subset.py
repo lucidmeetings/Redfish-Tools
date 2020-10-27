@@ -60,8 +60,8 @@ base_config = {
 }
 
 @patch('urllib.request') # so we don't make HTTP requests. NB: samples should not call for outside resources.
-def test_subset_mode(mockRequest):
-    """ TODO """
+def test_subset_mode_issue_271_inclusions(mockRequest):
+    """  """
 
     config = copy.deepcopy(base_config)
 
@@ -79,4 +79,25 @@ def test_subset_mode(mockRequest):
     docGen = DocGenerator([ input_dir ], '/dev/null', config)
     output = docGen.generate_docs()
 
+    # TODO: verify $ref are expanded-in-place where mentioned in profile (Status, IPv4Address, IPv6Address)
+    expected_status_snippet1 = '''
+<tr><td><nobr><b>Status</b> {</nobr></td><td>object</td><td></td><td>The status and health of the resource and its subordinate or dependent resources.</td></tr>
+<tr><td>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<nobr><b>Health</b></nobr></td><td>string<br>(enum)</td><td><nobr>read-only</nobr> (null)</td><td>This represents the health state of this resource in the absence of its dependent resources.<br><i>For the possible property values, see <a href="#redfish.dmtf.org/schemas/v1/Chassis.json|details|Health">Health</a> in Property details.</i></td></tr>
+<tr><td>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<nobr><b>State</b></nobr><br>}</td><td>string<br>(enum)</td><td><nobr>read-only</nobr> (null)</td><td>This indicates the known state of the resource, such as if it is enabled.<br><i>For the possible property values, see <a href="#redfish.dmtf.org/schemas/v1/Chassis.json|details|State">State</a> in Property details.</i></td></tr>
+'''
+    expected_status_snippet2 = '''
+<tr><td><nobr><b>Status</b> {</nobr></td><td>object</td><td></td><td>This property describes the status and health of the resource and its children.</td></tr>
+<tr><td>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<nobr><b>Health</b></nobr></td><td>string<br>(enum)</td><td><nobr>read-only</nobr> (null)</td><td>This represents the health state of this resource in the absence of its dependent resources.<br><i>For the possible property values, see <a href="#redfish.dmtf.org/schemas/v1/EthernetInterface.json|details|Health">Health</a> in Property details.</i></td></tr>
+<tr><td>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<nobr><b>State</b></nobr><br>}</td><td>string<br>(enum)</td><td><nobr>read-only</nobr> (null)</td><td>This indicates the known state of the resource, such as if it is enabled.<br><i>For the possible property values, see <a href="#redfish.dmtf.org/schemas/v1/EthernetInterface.json|details|State">State</a> in Property details.</i></td></tr>
+'''
+
+    assert expected_status_snippet1 in output
+    assert expected_status_snippet2 in output
+
+    # TODO: verify correct subset of Status, IPv4Address, IPv6Address are included.
+
     assert False
+
+
+
+# TODO: warn (or error) when a profile specifies requirements directly on the Resource, IPAddress, Redundancy, or Settings schemas
