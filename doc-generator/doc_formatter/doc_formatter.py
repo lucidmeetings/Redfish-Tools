@@ -1052,7 +1052,6 @@ class DocFormatter:
                         props[x]['required_parameter'] = props[x].get('requiredParameter')
 
                 if '$ref' in prop_info or 'anyOf' in prop_info:
-                    # FIXME: ensure profile here if appropriate (links/items)
                     return self.extend_property_info(schema_ref, prop_info)
 
             prop_infos.append(prop_info)
@@ -1363,7 +1362,6 @@ class DocFormatter:
         """
         traverser = self.traverser
 
-        # TODO: should this be true for any path that starts with 'Actions'?
         within_action = prop_path == ['Actions']
 
         # type may be a string or a list.
@@ -1509,6 +1507,10 @@ class DocFormatter:
         promote_me = False # Special case to replace enclosing array with combined array/simple-type
 
         if isinstance(prop_item, dict):
+
+            if '_profile' in prop_info:
+                prop_item['_profile'] = prop_info['_profile'] # carry through the profile, if present.
+
             if 'type' in prop_item and 'properties' not in prop_item:
                 prop_items = [prop_item]
                 collapse_description = True
@@ -1525,7 +1527,6 @@ class DocFormatter:
                 if 'readonly' in prop_info:
                     prop_item['readonly'] = prop_info['readonly']
 
-                # FIXME: add profile here.
                 prop_items = self.extend_property_info(schema_ref, prop_item)
 
                 if excerpt_copy_name:
@@ -1889,7 +1890,7 @@ class DocFormatter:
                     base_pattern_info['description'] = base_pattern_info['longDescription'] = description
                     base_pattern_info['verbatim_description'] = True
 
-                    pattern_info = self.extend_property_info(schema_ref, base_pattern_info) # TODO: do we need a profile here?
+                    pattern_info = self.extend_property_info(schema_ref, base_pattern_info)
 
                     formatted = self.format_property_row(schema_ref, prop_name, pattern_info, prop_path, in_schema_ref=in_schema_ref)
                     if formatted:

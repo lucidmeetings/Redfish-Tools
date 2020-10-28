@@ -60,7 +60,49 @@ base_config = {
 }
 
 @patch('urllib.request') # so we don't make HTTP requests. NB: samples should not call for outside resources.
-def test_subset_mode_issue_271_inclusions(mockRequest):
+def test_subset_mode_issue_271_expected_content_included_markdown(mockRequest):
+    """  """
+
+    config = copy.deepcopy(base_config)
+
+    config['output_format'] = 'markdown'
+
+    input_dir = os.path.abspath(os.path.join(testcase_path, 'subset_mode', 'json-schema'))
+    config['uri_to_local'] = {'redfish.dmtf.org/schemas/v1': input_dir}
+    config['local_to_uri'] = { input_dir : 'redfish.dmtf.org/schemas/v1'}
+
+    subset_config = os.path.abspath(os.path.join(testcase_path, 'subset_mode', 'subset_spec.json'))
+    config['profile_mode'] = 'subset'
+    config['profile_doc'] = subset_config
+
+    docGen = DocGenerator([ input_dir ], '/dev/null', config)
+    output = docGen.generate_docs()
+
+    # Verify $ref are expanded-in-place where mentioned in profile.
+    # Status is an example of an object property; it is used in two places with different requirements in this example:
+    expected_status_snippet1 = '''
+| **Status** { | object | This property describes the status and health of the resource and its children. |
+| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;**Health** | string<br>(enum)<br><br>*read-only<br>(null)* | This represents the health state of this resource in the absence of its dependent resources. *For the possible property values, see Health in Property details.* |
+| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;**State** | string<br>(enum)<br><br>*read-only<br>(null)* | This indicates the known state of the resource, such as if it is enabled. *For the possible property values, see State in Property details.* |
+'''
+    expected_status_snippet2 = '''
+| **Status** { | object | The status and health of the resource and its subordinate or dependent resources. |
+| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;**State** | string<br>(enum)<br><br>*read-only<br>(null)* | This indicates the known state of the resource, such as if it is enabled. *For the possible property values, see State in Property details.* |
+'''
+    assert expected_status_snippet1 in output
+    assert expected_status_snippet2 in output
+
+    # IPv4Address is an "items" property. The code path for this is a bit different.
+    expected_ipv4address_snippet = '''
+| **IPv4Addresses** [ { | array | The IPv4 addresses currently in use by this interface. |
+| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;**Address** | string<br><br>*read-write<br>(null)* | This is the IPv4 Address. |
+'''
+    assert expected_ipv4address_snippet in output
+
+
+
+@patch('urllib.request') # so we don't make HTTP requests. NB: samples should not call for outside resources.
+def test_subset_mode_issue_271_expected_content_included_html(mockRequest):
     """  """
 
     config = copy.deepcopy(base_config)
@@ -72,14 +114,14 @@ def test_subset_mode_issue_271_inclusions(mockRequest):
     config['local_to_uri'] = { input_dir : 'redfish.dmtf.org/schemas/v1'}
 
     subset_config = os.path.abspath(os.path.join(testcase_path, 'subset_mode', 'subset_spec.json'))
-    # config['subset_doc'] = subset_config
     config['profile_mode'] = 'subset'
     config['profile_doc'] = subset_config
 
     docGen = DocGenerator([ input_dir ], '/dev/null', config)
     output = docGen.generate_docs()
 
-    # TODO: verify $ref are expanded-in-place where mentioned in profile (Status, IPv4Address, IPv6Address)
+    # Verify $ref are expanded-in-place where mentioned in profile.
+    # Status is an example of an object property; it is used in two places with different requirements in this example:
     expected_status_snippet1 = '''
 <tr><td><nobr><b>Status</b> {</nobr></td><td>object</td><td></td><td>This property describes the status and health of the resource and its children.</td></tr>
 <tr><td>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<nobr><b>Health</b></nobr></td><td>string<br>(enum)</td><td><nobr>read-only</nobr> (null)</td><td>This represents the health state of this resource in the absence of its dependent resources.<br><i>For the possible property values, see <a href="#redfish.dmtf.org/schemas/v1/Chassis.json|details|Health">Health</a> in Property details.</i></td></tr>
@@ -93,9 +135,12 @@ def test_subset_mode_issue_271_inclusions(mockRequest):
     assert expected_status_snippet1 in output
     assert expected_status_snippet2 in output
 
-    # TODO: verify correct subset of Status, IPv4Address, IPv6Address are included.
-
-    assert False
+    # IPv4Address is an "items" property. The code path for this is a bit different.
+    expected_ipv4address_snippet = '''
+<tr><td><nobr><b>IPv4Addresses</b> [ {</nobr></td><td>array</td><td></td><td>The IPv4 addresses currently in use by this interface.</td></tr>
+<tr><td>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<nobr><b>Address</b></nobr><br>} ]</td><td>string</td><td><nobr>read-write</nobr> (null)</td><td>This is the IPv4 Address.</td></tr>
+'''
+    assert expected_ipv4address_snippet in output
 
 
 
