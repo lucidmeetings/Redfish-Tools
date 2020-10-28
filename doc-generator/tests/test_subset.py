@@ -12,6 +12,7 @@ import os
 import copy
 from unittest.mock import patch
 import pytest
+import warnings
 from doc_generator import DocGenerator
 from .discrepancy_list import DiscrepancyList
 
@@ -61,7 +62,7 @@ base_config = {
 
 @patch('urllib.request') # so we don't make HTTP requests. NB: samples should not call for outside resources.
 def test_subset_mode_issue_271_expected_content_included_markdown(mockRequest):
-    """  """
+    """ Generate subset documentation, testing mainly for problems identified in github issue 271. Markdown output """
 
     config = copy.deepcopy(base_config)
 
@@ -77,6 +78,10 @@ def test_subset_mode_issue_271_expected_content_included_markdown(mockRequest):
 
     docGen = DocGenerator([ input_dir ], '/dev/null', config)
     output = docGen.generate_docs()
+
+    # IntegerTest schema is in schema data, but should not appear in output.
+    unexpected_heading = 'IntegerTest'
+    assert unexpected_heading not in output
 
     # Verify $ref are expanded-in-place where mentioned in profile.
     # Status is an example of an object property; it is used in two places with different requirements in this example:
@@ -101,9 +106,9 @@ def test_subset_mode_issue_271_expected_content_included_markdown(mockRequest):
 
 
 
-@patch('urllib.request') # so we don't make HTTP requests. NB: samples should not call for outside resources.
+@patch('urllib.request') # so we don't make HTTP requests. NB: samples should not call for outside resources.d
 def test_subset_mode_issue_271_expected_content_included_html(mockRequest):
-    """  """
+    """ Generate subset documentation, testing mainly for problems identified in github issue 271. HTML output """
 
     config = copy.deepcopy(base_config)
 
@@ -119,6 +124,10 @@ def test_subset_mode_issue_271_expected_content_included_html(mockRequest):
 
     docGen = DocGenerator([ input_dir ], '/dev/null', config)
     output = docGen.generate_docs()
+
+    # IntegerTest schema is in schema data, but should not appear in output.
+    unexpected_heading = 'IntegerTest'
+    assert unexpected_heading not in output
 
     # Verify $ref are expanded-in-place where mentioned in profile.
     # Status is an example of an object property; it is used in two places with different requirements in this example:
@@ -144,4 +153,32 @@ def test_subset_mode_issue_271_expected_content_included_html(mockRequest):
 
 
 
-# TODO: warn (or error) when a profile specifies requirements directly on the Resource, IPAddress, Redundancy, or Settings schemas
+@patch('urllib.request') # so we don't make HTTP requests. NB: samples should not call for outside resources.
+def test_subset_mode_issue_271_warn_on_inappropriate_spec(mockRequest):
+    """ Warn when a profile specifies requirements directly on the Resource, IPAddress, Redundancy, or Settings schemas """
+
+    config = copy.deepcopy(base_config)
+
+    config['output_format'] = 'html'
+
+    input_dir = os.path.abspath(os.path.join(testcase_path, 'subset_mode', 'json-schema'))
+    config['uri_to_local'] = {'redfish.dmtf.org/schemas/v1': input_dir}
+    config['local_to_uri'] = { input_dir : 'redfish.dmtf.org/schemas/v1'}
+
+    subset_config = os.path.abspath(os.path.join(testcase_path, 'subset_mode', 'bad_spec.json'))
+    config['profile_mode'] = 'subset'
+    config['profile_doc'] = subset_config
+
+    with pytest.warns(UserWarning) as record:
+        docGen = DocGenerator([ input_dir ], '/dev/null', config)
+        output = docGen.generate_docs()
+
+    warning_msgs = [x.message.args[0] for x in record]
+    expected_msgs = [
+        'Profiles should not specify requirements directly on the "Resource" schema.',
+        'Profiles should not specify requirements directly on the "IPAddresses" schema.',
+        'Profiles should not specify requirements directly on the "Redundancy" schema.',
+        'Profiles should not specify requirements directly on the "Settings" schema.',
+        ]
+    for m in expected_msgs:
+        assert m in warning_msgs
