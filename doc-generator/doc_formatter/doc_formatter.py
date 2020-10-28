@@ -1272,7 +1272,7 @@ class DocFormatter:
                   'profile_comparison': None
                  }
 
-        profile = None
+        profile = fallback_profile = None
         # Skip profile data if prop_name is blank -- this is just an additional row of info and
         # the "parent" row will have the profile info.
         if self.config.get('profile_mode') and prop_name:
@@ -1281,7 +1281,7 @@ class DocFormatter:
                 profile_section = 'ActionRequirements'
             path_to_prop = prop_path.copy()
             path_to_prop.append(prop_name)
-            profile = self.get_prop_profile(schema_ref, path_to_prop, profile_section)
+            fallback_profile = self.get_prop_profile(schema_ref, path_to_prop, profile_section)
 
         anyof_details = [self.parse_property_info(schema_ref, prop_name, x, prop_path)
                          for x in prop_infos]
@@ -1323,6 +1323,11 @@ class DocFormatter:
         parsed['prop_required'] = details[0]['prop_required']
         parsed['prop_required_on_create'] = details[0]['prop_required_on_create']
         parsed['required_parameter'] = details[0].get('requiredParameter') == True
+
+        if '_profile' in parsed:
+            profile = parsed['_profile']
+        else:
+            profile = fallback_profile
 
         if profile is not None:
             parsed['is_in_profile'] = True
@@ -1387,7 +1392,9 @@ class DocFormatter:
         # Skip profile data if prop_name is blank -- this is just an additional row of info and
         # the "parent" row will have the profile info.
         profile = None
-        if self.config.get('profile_mode') and prop_name:
+        if '_profile' in prop_info:
+            profile = prop_info['_profile']
+        elif self.config.get('profile_mode') and prop_name: # TODO: unclear if this clause is still needed.
             prop_brief_name = prop_name
             profile_section = 'PropertyRequirements'
             if within_action:
