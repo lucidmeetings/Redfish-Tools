@@ -1466,9 +1466,6 @@ class DocGenerator:
         if not registry_uri_mapping_from_config:
             config['registry_uri_to_local'] = supplemental_data.get('registry_uri_to_local', {})
 
-        if 'enum_deprecations' in supplemental_data:
-            config['enum_deprecations'] = supplemental_data['enum_deprecations']
-
         if 'units_translation' not in config:
             config['units_translation'] = supplemental_data.get('units_translation', {})
 

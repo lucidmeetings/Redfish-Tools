@@ -10,7 +10,6 @@ The supplement is split into several major sections, noted by first-level headin
 - Description Overrides
 - FullDescription Overrides
 - Units Translation
-- Enum Deprecations
 - Introduction
 - Postscript
 - Excluded Properties
@@ -89,24 +88,6 @@ String-replacement for "units" values. Case-sensitive. Any units not matched wil
 | Mb/s             | Mbits/second     |
 | By               | Bytes            |
 
-
-# Enum Deprecations
-
-Second-level heading with path to enum definition (omit protocol):
-
-## redfish.dmtf.org/schemas/v1/ComputerSystem.v1_3_0.json#definitions/BootSource
-
-(Bullet with Enum name, pipe, version string, pipe, descriptive text.)
-
-* Floppy | 1.3+ | Deprecated in version 1.3+. The kids just think a floppy is a 3D printout of the "Save" icon now.
-
-* SomethingElse | 9.9+ | This will be ignored because it doesn't match anything, but it shows a second item.
-
-Non-bulleted lines will be ignored.
-
-## redfish.dmtf.org/schemas/v1/LogEntry.v1_2_0.json#definitions/LogEntryCode
-
-* Assert | 1.2+ | This is an example of deprecation on an enum with no enum descriptions. It will appear differently in the output.
 
 # Introduction
 
