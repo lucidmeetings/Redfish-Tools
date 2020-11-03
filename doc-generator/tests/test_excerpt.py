@@ -30,6 +30,7 @@ base_config = {
 }
 
 
+@pytest.mark.filterwarnings('ignore:mismatch detected in descriptions')
 @patch('urllib.request') # so we don't make HTTP requests. NB: samples should not call for outside resources.
 def test_excerpt_circuit(mockRequest):
     """ The Circuit schema contains many references to excerpts """
@@ -75,6 +76,7 @@ def test_excerpt_circuit(mockRequest):
     assert expected_excerpt in output
 
 
+@pytest.mark.filterwarnings('ignore:mismatch detected in descriptions')
 @patch('urllib.request') # so we don't make HTTP requests. NB: samples should not call for outside resources.
 def test_excerpt_html_links(mockRequest):
     """ Markdown doesn't include links to the excerpted schema, so we need to test this in HTML """
