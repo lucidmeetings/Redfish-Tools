@@ -58,10 +58,6 @@ base_supp = {
     "keywords": {
         "html_title": "Title from the supplemental doc",
         "actions_in_property_table": False
-    },
-    "units_translation": {
-        "s": "s_from_supp",
-        "Mb/s": "Mb/s_from_supp",
     }
 }
 
@@ -175,39 +171,10 @@ def test_config_cannot_set_common_objects(mock_exit):
 
 
 @patch('sys.exit') # Doc generator warns and exits when some specified paths are not valid on the filesystem.
-@pytest.mark.filterwarnings("ignore:\"/config/path/to/payloads\" is not a directory. Exiting.")
-def test_config_overrides_supplement(mock_exit):
-    """ Verify that if some parameters are specified in both the supplement and the config file,
-    the values from the config file are used.
-    """
-
-    cfg = base_cfg_in.copy()
-    supp = base_supp.copy()
-
-    config = DocGenerator.combine_configs(config_data=cfg, supplemental_data=supp)
-
-    assert config.get('local_to_uri') == {
-        "/config/path/to/json-schema": "redfish.dmtf.org/schemas/v1"
-    }
-    assert config.get('uri_to_local') == {
-        "redfish.dmtf.org/schemas/v1": "/config/path/to/json-schema"
-    }
-    assert config.get('units_translation') == {
-        "s": "s_from_cfg",
-        "Mb/s": "Mb/s_from_cfg",
-    }
-    assert config.get('html_title') == "Title from config"
-    assert config.get('actions_in_property_table') == True
-    assert config.get('import_from') == ['/config/path/to/schemas']
-    assert config.get('outfile_name') == 'config_outfile_name.html'
-    assert config.get('output_format') == 'html'
-
-
-@patch('sys.exit') # Doc generator warns and exits when some specified paths are not valid on the filesystem.
 @pytest.mark.filterwarnings("ignore:\"/cli/path/to/payloads\" is not a directory. Exiting.")
 def test_cli_overrides_config(mock_exit):
-    """ Verify that if some parameters are specified in both the supplement and the config file,
-    the values from the config file are used.
+    """ Verify that if some parameters are specified in both the config file and the command line,
+    the values from the command line are used.
     """
 
     cli_args = base_cli_args.copy()
