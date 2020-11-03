@@ -34,7 +34,6 @@ def parse_file(filehandle):
         '# Schema Documentation',  # list of search/replace patterns for links
         '# Description Overrides', # list of property name:description to substitute throughout the doc
         '# FullDescription Overrides', # list of property name:description to substitute throughout the doc
-        '# Units Translation',     # String-replace mapping for unit abbreviations
         ]
 
     for line in filehandle:
@@ -76,9 +75,6 @@ def parse_file(filehandle):
 
     if 'Schema Documentation' in parsed:
         parsed['Schema Documentation'] = parse_documentation_links(parsed['Schema Documentation'])
-
-    if 'Units Translation' in parsed:
-        parsed['units_translation'] = parse_units_translation(parsed['Units Translation'])
 
     return parsed
 
@@ -374,35 +370,5 @@ def parse_action_details(schema_supplement):
             new_blob = '\n'.join(new_blob_lines)
             example = '\n'.join(example_lines)
             parsed[schema_name][property] = {'text': new_blob, 'example': example}
-
-    return parsed
-
-
-def parse_units_translation(markdown_blob):
-    """Parse Unit Translations. Should contain a markdown table of Value, Replacement.
-
-    Creates a dict of value: replacement.
-    """
-    parsed = {}
-    heading_pattern = re.compile(r'\|\s*Value\s*\|\s*Replacement\s*\|');
-    row_pattern = re.compile(r'\|\s*(\S[.*\S]*)\s*\|\s*(\S[.*\S]*)\s*\|');
-
-    # First, find the translation table.
-    in_table = False
-    blob = ''
-    lines = markdown_blob.splitlines()
-    for line in lines:
-        line = line.strip()
-        if in_table:
-            match = row_pattern.fullmatch(line)
-            if match:
-                parsed[match.group(1)] = match.group(2)
-            else:
-                break
-        else:
-            match = heading_pattern.fullmatch(line)
-            if match:
-                in_table = True
-                continue
 
     return parsed
