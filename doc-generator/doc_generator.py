@@ -1250,6 +1250,7 @@ class DocGenerator:
             # config_flags don't have command-line overrides; they should be added to config directly.
             # We want to capture the fact that a flag was set, even if false, as this should override
             # the corresponding keyword in the supplemental markdown document.
+            # TODO: determine whether this is still needed, with stripped-down supplemental input.
             config_flags = [
                 'add_toc', 'units_translation', 'suppress_version_history',
                 'actions_in_property_table', 'html_title',
@@ -1421,34 +1422,20 @@ class DocGenerator:
         if 'FullDescription Overrides' in supplemental_data:
             config['property_fulldescription_overrides'] = supplemental_data['FullDescription Overrides']
 
-        # URI mappings may be provided either in the config file or the supplemental document.
-        # If they are in both, the version in the config file is what we use.
-        # If neither is populated, issue a warning.
-        if 'local_to_uri' in supplemental_data and not config['local_to_uri']:
-            config['local_to_uri'] = supplemental_data['local_to_uri']
-
         if not config['local_to_uri']:
-            warnings.warn(' '.join(['Schema URI Mapping was not found or empty.',
-                                        'URI mapping may be provided via config file or supplemental markdown.',
+            warnings.warn(' '.join(['Schema URI Mapping (uri_mapping) was not found or empty.',
+                                        'URI mapping must be provided via config file.',
                                         'Output is likely to be incomplete.',
                                         "\n\n"]))
 
-        if not uri_mapping_from_config:
-            if 'uri_to_local' in supplemental_data:
-                config['uri_to_local'] = supplemental_data['uri_to_local']
-                config['local_to_uri'] = supplemental_data['local_to_uri']
-
-            if 'profile_uri_to_local' in supplemental_data:
-                config['profile_uri_to_local'] = supplemental_data['profile_uri_to_local']
-
         if 'profile_uri_to_local' not in config:
-            config['profile_uri_to_local'] = supplemental_data.get('profile_uri_to_local', {})
+            config['profile_uri_to_local'] = {};
 
-        if not registry_uri_mapping_from_config:
-            config['registry_uri_to_local'] = supplemental_data.get('registry_uri_to_local', {})
+        if 'registry_uri_to_local' not in config:
+            config['registry_uri_to_local'] = {}
 
         if 'units_translation' not in config:
-            config['units_translation'] = supplemental_data.get('units_translation', {})
+            config['units_translation'] = {}
 
         config['schema_supplement'] = supplemental_data.get('Schema Supplement', {})
 

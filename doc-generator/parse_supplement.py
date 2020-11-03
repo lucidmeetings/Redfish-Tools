@@ -34,9 +34,6 @@ def parse_file(filehandle):
         '# Schema Documentation',  # list of search/replace patterns for links
         '# Description Overrides', # list of property name:description to substitute throughout the doc
         '# FullDescription Overrides', # list of property name:description to substitute throughout the doc
-        '# Schema URI Mapping',    # map URI(s) to local repo(s)
-        '# Profile URI Mapping',   # map URI(s) for profiles to local repo(s)
-        '# Registry URI Mapping',  # map URI(s) for registries to local repo(s)
         '# Units Translation',     # String-replace mapping for unit abbreviations
         ]
 
@@ -79,23 +76,6 @@ def parse_file(filehandle):
 
     if 'Schema Documentation' in parsed:
         parsed['Schema Documentation'] = parse_documentation_links(parsed['Schema Documentation'])
-
-    if 'Schema URI Mapping' in parsed:
-        parsed['local_to_uri'], parsed['uri_to_local'] = parse_uri_mapping(parsed['Schema URI Mapping'])
-
-    if 'Profile URI Mapping' in parsed:
-        parsed['profile_local_to_uri'], parsed['profile_uri_to_local'] = parse_uri_mapping(
-            parsed['Profile URI Mapping'])
-        if not parsed.get('profile_uri_to_local'):
-            warnings.warn("Profile URI Mapping found in supplemental document didn't provide any mappings." + ' ' +
-                              'Output is likely to be incomplete.' + "\n\n")
-
-    if 'Registry URI Mapping' in parsed:
-        parsed['registry_local_to_uri'], parsed['registry_uri_to_local'] = parse_uri_mapping(
-            parsed['Registry URI Mapping'])
-        if not parsed.get('registry_uri_to_local'):
-            warnings.warn("Registry URI Mapping found in supplemental document didn't provide any mappings." + ' ' +
-                              'Output is likely to be incomplete.' + "\n\n")
 
     if 'Units Translation' in parsed:
         parsed['units_translation'] = parse_units_translation(parsed['Units Translation'])
@@ -170,33 +150,6 @@ def parse_documentation_links(markdown_blob):
                 linkmap[to_replace].append({'full_match': to_replace,
                                             'replace_with':  replace_with})
     return linkmap
-
-
-def parse_uri_mapping(markdown_blob):
-    """Parse a Schema URI mapping section, producing maps in both directions."""
-    local_to_uri = {}
-    uri_to_local = {}
-
-    for line in markdown_blob.splitlines():
-        if line.startswith('## Local-repo:'):
-            scratch = line[14:]
-            scratch = scratch.strip()
-            parts = scratch.split(' ')
-            if len(parts) == 2:
-                uri = parts[0] # Actually a URI part -- domain and path
-                local_path = parts[1]
-
-                # Validate the local_path and normalize it:
-                abs_local_path = os.path.abspath(local_path)
-                if os.path.isdir(abs_local_path):
-                    local_to_uri[abs_local_path] = uri
-                    uri_to_local[uri] = abs_local_path
-                else:
-                    warnings.warn('URI mapping in Supplemental file has a bad local path "%(path)s"' % {'path': local_path})
-            else:
-                warnings.warn('Could not parse URI mapping from Supplemental file: "%(line)s"' % {'line': line})
-
-    return local_to_uri, uri_to_local
 
 
 def parse_title_from_introduction(markdown_blob):

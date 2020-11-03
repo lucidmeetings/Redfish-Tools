@@ -59,19 +59,13 @@ base_supp = {
         "html_title": "Title from the supplemental doc",
         "actions_in_property_table": False
     },
-    "local_to_uri": {
-        "/supp/path/to/json-schema": "redfish.dmtf.org/schemas/v1"
-    },
-    "uri_to_local": {
-        "redfish.dmtf.org/schemas/v1": "/supp/path/to/json-schema"
-    },
     "units_translation": {
         "s": "s_from_supp",
         "Mb/s": "Mb/s_from_supp",
     }
 }
 
-@pytest.mark.filterwarnings("ignore:Schema URI Mapping was not found or empty.")
+@pytest.mark.filterwarnings('ignore:Schema URI Mapping')
 def test_config_keys():
     """ Ensure expected keys are present in config, even if no config input is provided.
 
@@ -115,7 +109,7 @@ def test_config_keys():
         assert key in config
 
 
-@pytest.mark.filterwarnings("ignore:Schema URI Mapping was not found or empty.")
+@pytest.mark.filterwarnings('ignore:Schema URI Mapping')
 def test_config_defaults():
     """ Ensure expected defaults are set in config, even if no config input is provided.
 
@@ -133,39 +127,6 @@ def test_config_defaults():
     import_from = config['import_from'].pop()
     assert import_from.startswith(cwd)
     assert import_from.endswith('json-schema')
-
-
-def test_supplement_only():
-    """ Test that config is something reasonable when only the supplemental file is supplied.
-
-    Note: there is no real-world use case where command-line arguments will not be supplied,
-    but this test does some work in verifying that values from the supplement are carried over
-    """
-    supp = base_supp.copy()
-
-    # Update keywords and wants_common_objects,just for this test:
-    supp["keywords"] = {
-        "html_title": "Title from the supplemental doc",
-        "actions_in_property_table": True
-    }
-    supp['wants_common_objects'] = True
-
-    config = DocGenerator.combine_configs(supplemental_data=supp)
-
-    assert config.get('supplemental') == supp
-    assert config.get('local_to_uri') == {
-        "/supp/path/to/json-schema": "redfish.dmtf.org/schemas/v1"
-    }
-    assert config.get('uri_to_local') == {
-        "redfish.dmtf.org/schemas/v1": "/supp/path/to/json-schema"
-    }
-    assert config.get('units_translation') ==  {
-        "s": "s_from_supp",
-        "Mb/s": "Mb/s_from_supp",
-    }
-    assert config.get('html_title') == "Title from the supplemental doc"
-    assert config.get('wants_common_objects') == True
-    assert config.get('actions_in_property_table') == True
 
 
 @patch('sys.exit') # Doc generator warns and exits when some specified paths are not valid on the filesystem.
