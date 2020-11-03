@@ -4,12 +4,9 @@ This document is an example of a usersupplement.md document, which contains conf
 
 The supplement is split into several major sections, noted by first-level headings. All are optional, and the order of sections doesn't matter. Sections may include first-level headings (you will almost certainly want one in the Introduction); only exact matches for the following are detected as section delimiters:
 
-- Schema URI Mapping
-- Profile URI Mapping
 - Keyword Configuration
 - Description Overrides
 - FullDescription Overrides
-- Units Translation
 - Introduction
 - Postscript
 - Schema Supplement
@@ -19,27 +16,6 @@ Text at the top of the supplement, like this text, is ignored up until the first
 You can add an explicit page break (HTML paragraph with style="page-break-before: always") anywhere by putting the word pagebreak, surrounded by tildes, in the supplemental document:
 
 ~pagebreak~
-
-
-# Schema URI Mapping
-
-Map schema URIs to local files. You may omit the protocol (e.g., https://) from the URI.
-The doc generator will use the local files when specified and otherwise
-follow the full URI, including data from remote files if possible.
-
-## Local-repo: redfish.dmtf.org/schemas/v1 ./json-schema
-
-
-# Profile URI Mapping
-
-Meaningful only for profile-mode output, and probably only if the
-profile specifies RequiredProfiles.
-
-Map schema URIs to local files. You may omit the protocol (e.g., https://) from the URI.
-The doc generator will use the local files when specified and otherwise
-follow the full URI, including data from remote files if possible.
-
-## Local-repo: redfish.dmtf.org/profiles ../Redfish-Tools/doc-generator/sample_inputs
 
 
 # Keyword Configuration
@@ -73,17 +49,6 @@ Note: markdown is allowed in description overrides, but HTML markup is not; it w
 This is just like Description Overrides, except that *only* the description will be output, with no auto-generated reference.
 
 * Status: See  [The Status Object](#status_description), above.
-
-# Units Translation
-
-String-replacement for "units" values. Case-sensitive. Any units not matched will be output as-is.
-
-| Value            | Replacement      |
-| ---------------- | ---------------- |
-| s                | seconds          |
-| Mb/s             | Mbits/second     |
-| By               | Bytes            |
-
 
 # Introduction
 
