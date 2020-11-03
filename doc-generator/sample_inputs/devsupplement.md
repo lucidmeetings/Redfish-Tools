@@ -31,33 +31,6 @@ Text in this section is placed at the end of the document, following all of the 
 Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum
 
 
-# Excluded Properties
-
-This section documents properties that are either common throughout the Redfish Schema, or are defined in the Resource.1.x.x or odata.4.x.x schema files.  Therefore, for clarity, they are excluded from the schema-specific tables.
-
-## @odata.context
-
-## @odata.id
-
-## @odata.type
-
-## *@odata.count
-
-# Excluded Schemas
-
-Schemas listed here are excluded from the output document.  This can be used to remove supporting documents while still allowing for easy bulk processing of whole schema directories.
-
-## *Collection
-
-Wildcard removal of anything with "Collection" in the name
-
-# Excluded patternProperties
-
-You'll probably want to exclude this and only this:
-
-## ^([a-zA-Z_][a-zA-Z0-9_]*)?@(odata|Redfish|Message)\.[a-zA-Z_][a-zA-Z0-9_.]+$
-
-
 # Schema Supplement
 
 This is the schema-specific section.  2nd-level headings indicate the schema name with the major version appended (default is "_1" if not present).

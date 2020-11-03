@@ -1227,10 +1227,6 @@ class DocGenerator:
 
         if config_data:
 
-            # The --config argument does double duty; originally it was strictly for property_index_config.
-            if config_data.get('property_index') or command_line_args.get('property_index'):
-                config['property_index_config'] = config_data
-
             # command-line arguments override the config file.
             config_args = [
                 'supfile', 'format', 'outfile', 'payload_dir', 'normative',
@@ -1334,14 +1330,11 @@ class DocGenerator:
                 sys.exit();
 
         if config.get('output_content') == 'property_index':
-             if 'property_index_config' not in config:
-                 # Minimal config is required; we'll be adding to this.
-                 config['property_index_config'] = {'DescriptionOverrides': {},
-                                                    'ExcludedProperties': []}
-             else:
-                 if 'ExcludedProperties' not in config['property_index_config']:
-                     config['property_index_config']['ExcludedProperties'] = config.get('excluded_properties', [])
-
+             # Minimal config is required; we'll be adding to this.
+             if 'excluded_properties' not in config:
+                 config['excluded_properties'] = []
+             if 'description_overrides' not in config:
+                 config['description_overrides'] = {}
 
         # Check profile document, if specified
         if combined_args.get('profile_doc'):
@@ -1388,25 +1381,19 @@ class DocGenerator:
         if 'excluded_annotations' in config_data:
             excluded_annotations['exact'] = [x for x in config_data['excluded_annotations'] if not x.startswith('*')]
             excluded_annotations['wildcard'] = [x[1:] for x in config_data['excluded_annotations'] if x.startswith('*')]
-        elif 'Excluded Annotations' in supplemental_data:
-            excluded_annotations['exact'] = supplemental_data['Excluded Annotations'].get('exact_match')
-            excluded_annotations['wildcard'] = supplemental_data['Excluded Annotations'].get('wildcard_match')
         if excluded_annotations.get('exact'):
             excl = excluded_annotations.get('exact')
             config['excluded_properties'].extend(excl)
             config['excluded_annotations'].extend(excl)
         if excluded_annotations.get('wildcard'):
             excl = excluded_annotations.get('wildcard')
-            config['excluded_by_match'].extend(excl)
+            config['excluded_by_match'].extend(excl) # intentional?
             config['excluded_annotations_by_match'].extend(excl)
 
         excluded_properties = {}
         if 'excluded_properties' in config_data:
             excluded_properties['exact'] = [x for x in config_data['excluded_properties'] if not x.startswith('*')]
             excluded_properties['wildcard'] = [x[1:] for x in config_data['excluded_properties'] if x.startswith('*')]
-        elif 'Excluded Properties' in supplemental_data:
-            excluded_properties['exact'] = supplemental_data['Excluded Properties'].get('exact_match', [])
-            excluded_properties['wildcard'] = supplemental_data['Excluded Properties'].get('wildcard_match', [])
         if excluded_properties.get('exact'):
             config['excluded_properties'].extend(excluded_properties['exact'])
         if excluded_properties.get('wildcard'):
@@ -1416,9 +1403,6 @@ class DocGenerator:
         if 'excluded_schemas' in config_data:
             excluded_schemas['exact'] = [x for x in config_data['excluded_schemas'] if not x.startswith('*')]
             excluded_schemas['wildcard'] = [x[1:] for x in config_data['excluded_schemas'] if x.startswith('*')]
-        elif 'Excluded Schemas' in supplemental_data:
-            excluded_schemas['exact'] = supplemental_data['Excluded Schemas'].get('exact_match')
-            excluded_schemas['wildcard'] = supplemental_data['Excluded Schemas'].get('wildcard_match')
         if excluded_schemas.get('exact'):
             config['excluded_schemas'] = excluded_schemas['exact']
         if excluded_schemas.get('wildcard'):
@@ -1430,9 +1414,6 @@ class DocGenerator:
         excluded_patterns = {}
         if 'excluded_pattern_properties' in config_data:
             config['excluded_pattern_props'].extend([x for x in config_data['excluded_pattern_properties']])
-        elif 'Excluded patternProperties' in supplemental_data:
-            config['excluded_pattern_props'].extend(supplemental_data['Excluded patternProperties'].get('exact_match'))
-            config['excluded_pattern_props'].extend(supplemental_data['Excluded patternProperties'].get('wildcard_match'))
 
         if 'Description Overrides' in supplemental_data:
             config['property_description_overrides'] = supplemental_data['Description Overrides']

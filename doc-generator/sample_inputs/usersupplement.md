@@ -12,10 +12,6 @@ The supplement is split into several major sections, noted by first-level headin
 - Units Translation
 - Introduction
 - Postscript
-- Excluded Properties
-- Excluded Annotations
-- Excluded Schemas
-- Excluded patternProperties
 - Schema Supplement
 
 Text at the top of the supplement, like this text, is ignored up until the first recognized section header.
@@ -126,47 +122,6 @@ A fragment is a definition pulled out of some schema. Use #include_fragment at t
 Text in this section is placed at the end of the document, following all of the schema sections.
 
 Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum
-
-
-# Excluded Properties
-
-This section documents properties that are either common throughout the Redfish Schema, or are defined in the Resource.1.x.x or odata.4.x.x schema files.  Therefore, for clarity, they are excluded from the schema-specific tables. Excluded Properties are excluded _only_ from root-level properties.
-
-Each property to be excluded should be listed in this section with a '## ' prefix -- that is, as a second-level heading.
-Partial match is supported; prepend '*' to indicate partial matches.
-
-## @odata.id
-
-## @odata.context
-
-## @odata.type
-
-# Excluded Annotations
-
-Excluded Annotations are omitted from property lists at all levels. Partial match is supported; prepend '*' to exclude partial matches. Excluded annotations are omitted throughout the generated documentation.
-
-Each annotation to be excluded should be listed in this section with a '## ' prefix -- that is, as a second-level heading.
-Partial match is supported; prepend '*' to indicate partial matches.
-
-## *@odata.count
-## *@odata.navigationLink
-
-# Excluded Schemas
-
-Schemas listed here are excluded from the output document.  This can be used to remove supporting documents while still allowing for easy bulk processing of whole schema directories.
-
-Each schema name to be excluded should be listed in this section with a '## ' prefix -- that is, as a second-level heading.
-Partial match is supported; prepend '*' to indicate partial matches.
-
-## *Collection
-
-(Wildcard removal of anything with "Collection" in the name)
-
-# Excluded patternProperties
-
-You'll probably want to exclude this and only this:
-
-## ^([a-zA-Z_][a-zA-Z0-9_]*)?@(odata|Redfish|Message)\.[a-zA-Z_][a-zA-Z0-9_.]+$
 
 
 # Schema Supplement

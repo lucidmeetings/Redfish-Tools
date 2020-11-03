@@ -30,10 +30,6 @@ def parse_file(filehandle):
         '# Keyword Configuration', # list of keyword settings
         '# Introduction',          # block of markup for intro, with possible #includes
         '# Postscript',            # block of markup to include verbatim
-        '# Excluded Properties',   # parse out properties (## headings) to exclude (top-level only).
-        '# Excluded Annotations',  # parse out properties (## headings) to exclude.
-        '# Excluded Schemas',      # parse out schemas (## headings) to exclude.
-        '# Excluded patternProperties', # parse out patternProperties (## headings) to exclude.
         '# Schema Supplement',     # parse out for schema-specific details (see below)
         '# Schema Documentation',  # list of search/replace patterns for links
         '# Description Overrides', # list of property name:description to substitute throughout the doc
@@ -67,18 +63,6 @@ def parse_file(filehandle):
 
     if not parsed.get('wants_common_objects') and 'Postscript' in parsed:
         parsed['wants_common_objects'] = '[insert_common_objects]' in parsed['Postscript']
-
-    if 'Excluded Properties' in parsed:
-        parsed['Excluded Properties'] = parse_excluded_properties(parsed['Excluded Properties'])
-
-    if 'Excluded Annotations' in parsed:
-        parsed['Excluded Annotations'] = parse_excluded_properties(parsed['Excluded Annotations'])
-
-    if 'Excluded Schemas' in parsed:
-        parsed['Excluded Schemas'] = parse_excluded_properties(parsed['Excluded Schemas'])
-
-    if 'Excluded patternProperties' in parsed:
-        parsed['Excluded patternProperties'] = parse_excluded_properties(parsed['Excluded patternProperties'])
 
     if 'Description Overrides' in parsed:
         parsed['Description Overrides'] = parse_description_overrides(parsed['Description Overrides'])
@@ -223,26 +207,6 @@ def parse_title_from_introduction(markdown_blob):
         if line.startswith('# '):
             line = line.strip('# ')
             return line
-
-
-def parse_excluded_properties(markdown_blob):
-    """Find second-level headings (start with ##) in markdown_blob.
-
-    Properties that begin with * are treated as wildcard matches."""
-
-    parsed = {'exact_match': [], 'wildcard_match': []}
-
-    lines = markdown_blob.splitlines()
-    for line in lines:
-        if line.startswith('## '):
-            line = line.strip('# ')
-            if line.startswith('*'):
-                line = line[1:]
-                parsed['wildcard_match'].append(line)
-            else:
-                parsed['exact_match'].append(line)
-
-    return parsed
 
 
 def parse_description_overrides(markdown_blob):

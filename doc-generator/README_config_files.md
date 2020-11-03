@@ -43,7 +43,6 @@ The following properties would otherwise be parsed from the supplemental markdow
 - excluded_annotations: A list of annotation names (strings) to omit. Wildcard match is supported for strings that begin with "*".
 - excluded_pattern_properties: pattern properties to omit from output. Note that backslashes must be escaped in JSON ("\" becomes "\\").
 - excluded_schemas: Schemas (by name) to omit from output.
-- ExcludedProperties: synonym for excluded_properties; supported for only for property index output (for backward compatibility).
 - DescriptionOverrides: for property index output (only). See the config_for_property_index.json file for examples.
 
 The following property can be supplied only in the config file:
