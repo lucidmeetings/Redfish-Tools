@@ -11,8 +11,8 @@ The current version of the Doc Generator takes configuration input on the comman
 | File             | Format     | Purpose                                                       |
 |------------------|------------|---------------------------------------------------------------|
 | config           | JSON       | Top-level configuration, including all command-line options. This file also specifies the locations of other configuration  files. |
-| boilerplate intro | markdown or html | Content to be inserted in the output verbatim, prior to the generated documentation. May include an `\[add_toc\]` placeholder to specify where to include a table of contents. |
-| boilerplate postscript | markdown or html | Content to be inserted in the output verbatim, after the generated documentation. May include an `\[add_toc\]` placeholder to specify where to include a table of contents. |
+| boilerplate intro | markdown or html | Content to be inserted in the output verbatim, prior to the generated documentation. May include an `[add_toc]` placeholder to specify where to include a table of contents. |
+| boilerplate postscript | markdown or html | Content to be inserted in the output verbatim, after the generated documentation. May include an `[add_toc]` placeholder to specify where to include a table of contents. |
 | content supplement | JSON     | Text replacements and additions. Includes: text overrides for property descriptions, units translation (replacements for unit abbreviations), schema-specific intros, postscripts, and property description substitutions. |
 | subset doc       | JSON       | Subset profile, unchanged for v3. _Link to spec for this?_         |
 
