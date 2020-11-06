@@ -35,7 +35,7 @@ base_config = {
         "*@odata.count",
         ],
     'uri_replacements': {},
-    'description_overrides': {},
+    'property_description_overrides': {},
     'supplemental': {},
 
     'profile': {},
@@ -122,7 +122,7 @@ def test_property_index_config_out(mockRequest):
     updated_config = docGen.generator.generate_updated_config()
 
     # Checking specific cases here.
-    out = updated_config['description_overrides']
+    out = updated_config['property_description_overrides']
     assert out.get('LowerThresholdFatal') == expected['LowerThresholdFatal'], "Type mismatch not detected for LowerThresholdFatal"
     assert out.get('RelatedItem') == expected['RelatedItem'], "Description mismatch not detected for RelatedItem"
     assert out.get('FanName') == expected['FanName'], "Description mismatch not detected for FanName"
@@ -137,7 +137,7 @@ def test_property_index_config_overrides(mockRequest):
 
     override_desc = "This is an override description for NetDevFuncCapbilities, a string."
 
-    config['description_overrides'] = {
+    config['property_description_overrides'] = {
         "NetDevFuncCapabilities": [
         {
         "overrideDescription": override_desc,

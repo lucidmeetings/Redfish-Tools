@@ -1334,8 +1334,8 @@ class DocGenerator:
              # Minimal config is required; we'll be adding to this.
              if 'excluded_properties' not in config:
                  config['excluded_properties'] = []
-             if 'description_overrides' not in config:
-                 config['description_overrides'] = {}
+             if 'property_description_overrides' not in config:
+                 config['property_description_overrides'] = {}
 
         # Check profile document, if specified
         if combined_args.get('profile_doc'):

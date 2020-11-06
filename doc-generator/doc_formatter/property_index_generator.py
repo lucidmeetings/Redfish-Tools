@@ -47,7 +47,7 @@ class PropertyIndexGenerator(DocFormatter):
         self.properties_by_name = {}
         self.coalesced_properties = {}
         # Shorthand for the overrides.
-        self.overrides = config.get('description_overrides', {})
+        self.overrides = config.get('property_description_overrides', {})
 
         # Force some config here:
         self.config['omit_version_in_headers'] = True # This puts just the schema name in the section head.
@@ -294,7 +294,7 @@ class PropertyIndexGenerator(DocFormatter):
         and it has a globalDescription, flag only entries with a different *type*. """
 
         updated = copy.deepcopy(self.config)
-        overrides = updated['description_overrides'] # NB: this should already be in place.
+        overrides = updated['property_description_overrides'] # NB: this should already be in place.
 
         # Sorting isn't necessary in this method, but it's nice to have for troubleshooting.
         property_names = sorted(self.coalesced_properties.keys(), key=str.lower)
