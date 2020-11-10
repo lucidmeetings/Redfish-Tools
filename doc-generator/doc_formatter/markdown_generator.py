@@ -722,14 +722,15 @@ search: true
 ---
 """
 
-        intro = supplemental.get('Introduction')
+        intro = self.config.get('intro_content')
         if intro:
             intro = self.process_intro(intro)
             prelude += '\n' + intro + '\n'
 
         contents = [prelude, body]
-        if 'Postscript' in supplemental:
-            contents.append('\n' + supplemental['Postscript'])
+        postscript = self.config.get('postscript_content')
+        if postscript:
+            contents.append('\n' + postscript)
 
         output = '\n'.join(contents)
         if '[insert_common_objects]' in output:

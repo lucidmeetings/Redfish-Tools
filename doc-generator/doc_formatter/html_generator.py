@@ -808,15 +808,16 @@ pre.code{
         supplemental = self.config.get('supplemental', {})
         body = ''
 
-        intro = supplemental.get('Introduction')
+        intro = self.config.get('intro_content')
         if intro:
             intro = self.process_intro(intro)
             body += intro
 
         body += self.emit()
 
-        if 'Postscript' in supplemental:
-            body += self.formatter.markdown_to_html(supplemental['Postscript'])
+        postscript = self.config.get('postscript_content')
+        if postscript:
+            body += self.formatter.markdown_to_html(postscript)
 
         common_properties = self.generate_common_properties_doc()
         marker = False

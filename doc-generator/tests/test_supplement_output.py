@@ -76,21 +76,21 @@ def test_supplement_output_html (mockRequest):
 
     # Chop up the HTML into rough sections.
     output_parts = output.split('<h2')
-    [status_section] = [x for x in output_parts if 'id="common-properties-Status"' in x]
-    [endpoint_section] = [x for x in output_parts if 'id="Endpoint"' in x]
+    status_section = [x for x in output_parts if 'id="common-properties-Status"' in x]
+    endpoint_section = [x for x in output_parts if 'id="Endpoint"' in x]
 
     # Chop into rows. We just want to find the Oem rows.
     output_rows = output.split('<tr')
     oem_rows = [x for x in output_rows if "<b>Oem</b>" in x]
 
     # These assertions target strings the supplement provided:
-    assert 'SUPPLEMENT-SUPPLIED DESCRIPTION for Status' in status_section, "Referenced Object (Status) output is missing supplement-supplied description"
-    assert 'SUPPLEMENT-SUPPLIED INTRO for Status' in status_section, "Referenced Object (Status) output is missing supplement-supplied intro"
-    assert 'SUPPLEMENT-SUPPLIED JSON for Status' in status_section, "Referenced Object (Status) output is missing supplement-supplied json payload"
+    assert len(status_section) == 1 and 'SUPPLEMENT-SUPPLIED DESCRIPTION for Status' in status_section[0], "Referenced Object (Status) output is missing supplement-supplied description"
+    assert len(status_section) == 1 and 'SUPPLEMENT-SUPPLIED INTRO for Status' in status_section[0], "Referenced Object (Status) output is missing supplement-supplied intro"
+    assert len(status_section) == 1 and 'SUPPLEMENT-SUPPLIED JSON for Status' in status_section[0], "Referenced Object (Status) output is missing supplement-supplied json payload"
 
-    assert 'SUPPLEMENT-SUPPLIED DESCRIPTION for Endpoint' in endpoint_section, "Schema Object (Endpoint) output is missing supplement-supplied description"
-    assert 'SUPPLEMENT-SUPPLIED INTRO for Endpoint' in endpoint_section, "Schema Object (Endpoint) output is missing supplement-supplied intro"
-    assert 'SUPPLEMENT-SUPPLIED JSON for Endpoint' in endpoint_section, "Schema Object (Endpoint) output is missing supplement-supplied json payload"
+    assert len(endpoint_section) == 1 and 'SUPPLEMENT-SUPPLIED DESCRIPTION for Endpoint' in endpoint_section[0], "Schema Object (Endpoint) output is missing supplement-supplied description"
+    assert len(endpoint_section) == 1 and 'SUPPLEMENT-SUPPLIED INTRO for Endpoint' in endpoint_section[0], "Schema Object (Endpoint) output is missing supplement-supplied intro"
+    assert len(endpoint_section) == 1 and 'SUPPLEMENT-SUPPLIED JSON for Endpoint' in endpoint_section[0], "Schema Object (Endpoint) output is missing supplement-supplied json payload"
 
 
     oem_failed_overrides = [x for x in oem_rows if "This is a description override for the Oem object." not in x]

@@ -1173,10 +1173,11 @@ class DocGenerator:
         return None
 
     @staticmethod
-    def combine_configs(command_line_args=None, config_data=None, supplemental_data=None):
+    def combine_configs(command_line_args=None, config_data=None, supp_config_data=None, supplemental_data=None):
         """ Generate configuration based on various inputs (which should be dictionaries):
         command_line_args: command-line arguments
         config_data: read in from a config file
+        supp_config_data: read in from content supplement config file
         supplemental_data: read and parsed from a supplemental markdown document
 
         If a parameter is specified in more than one place, config_data supersedes supplemental_data,
@@ -1187,8 +1188,12 @@ class DocGenerator:
             command_line_args = {}
         if not config_data:
             config_data = {}
+        if not supp_config_data:
+            supp_config_data = {}
         if not supplemental_data:
             supplemental_data = {}
+        # FOR DEVELOPMENT/DEBUGGING:
+        supplemental_data = {}
 
         uri_mapping_from_config = config_data.get('uri_to_local')
         registry_uri_mapping_from_config = config_data.get('registry_uri_to_local')
@@ -1204,8 +1209,11 @@ class DocGenerator:
             'excluded_schemas': [],
             'excluded_schemas_by_match': [],
             'excluded_pattern_props': [],
+            'property_description_overrides': {},
+            'property_fulldescription_overrides': {},
+            'wants_common_objects': False,
             'omit_version_in_headers': False,
-            'schema_supplement': None,
+            'schema_supplement': {},
             'normative': False,
             'escape_chars': [],
             'cwd': cwd,
@@ -1217,6 +1225,9 @@ class DocGenerator:
             'profile_doc': None,
             'profile_resources': {},
             'profile': {},
+            'profile_uri_to_local': {},
+            'registry_uri_to_local': {},
+            'units_translation': {},
             'combine_multiple_refs': 0,
             }
 
@@ -1226,6 +1237,14 @@ class DocGenerator:
         combined_args = command_line_args.copy()
 
         if config_data:
+
+            # boilerplate content always comes from config_data:
+            for bp in ['intro_content', 'postscript_content']:
+                bp_content = config_data.get(bp)
+                if bp_content:
+                    config[bp] = bp_content
+                    if '[insert_common_objects]' in bp_content:
+                        config['wants_common_objects'] = True
 
             # command-line arguments override the config file.
             config_args = [
@@ -1330,13 +1349,6 @@ class DocGenerator:
                 warnings.warn('Unable to read payload_dir "%(dirname)s": %(message)s' % {'dirname': combined_args['payload_dir'], 'message': str(ex)})
                 sys.exit();
 
-        if config.get('output_content') == 'property_index':
-             # Minimal config is required; we'll be adding to this.
-             if 'excluded_properties' not in config:
-                 config['excluded_properties'] = []
-             if 'property_description_overrides' not in config:
-                 config['property_description_overrides'] = {}
-
         # Check profile document, if specified
         if combined_args.get('profile_doc'):
             if combined_args['profile_terse']:
@@ -1368,9 +1380,12 @@ class DocGenerator:
                               InfoWarning)
             sys.exit()
 
-        if 'keywords' in supplemental_data:
+        if 'units_translation' in supp_config_data:
+            config['units_translation'] = supp_config_data['units_translation']
+
+        if 'keywords' in supp_config_data:
             # Promote the keywords to top-level keys.
-            for key, val in supplemental_data['keywords'].items():
+            for key, val in supp_config_data['keywords'].items():
                 if key not in config:
                     config[key] = val
 
@@ -1416,11 +1431,11 @@ class DocGenerator:
         if 'excluded_pattern_properties' in config_data:
             config['excluded_pattern_props'].extend([x for x in config_data['excluded_pattern_properties']])
 
-        if 'Description Overrides' in supplemental_data:
-            config['property_description_overrides'] = supplemental_data['Description Overrides']
+        if 'property_description_overrides' in supp_config_data:
+            config['property_description_overrides'] = supp_config_data['property_description_overrides']
 
-        if 'FullDescription Overrides' in supplemental_data:
-            config['property_fulldescription_overrides'] = supplemental_data['FullDescription Overrides']
+        if 'property_fulldescription_overrides' in supp_config_data:
+            config['property_fulldescription_overrides'] = supp_config_data['property_fulldescription_overrides']
 
         if not config['local_to_uri']:
             warnings.warn(' '.join(['Schema URI Mapping (uri_mapping) was not found or empty.',
@@ -1428,18 +1443,7 @@ class DocGenerator:
                                         'Output is likely to be incomplete.',
                                         "\n\n"]))
 
-        if 'profile_uri_to_local' not in config:
-            config['profile_uri_to_local'] = {};
-
-        if 'registry_uri_to_local' not in config:
-            config['registry_uri_to_local'] = {}
-
-        if 'units_translation' not in config:
-            config['units_translation'] = {}
-
-        config['schema_supplement'] = supplemental_data.get('Schema Supplement', {})
-
-        config['wants_common_objects'] = supplemental_data.get('wants_common_objects', False)
+        config['schema_supplement'] = supp_config_data.get('schema_supplement', {})
 
         config['normative'] = combined_args.get('normative', False)
 
@@ -1468,9 +1472,9 @@ def main():
     cwd = os.getcwd()
 
     command_line_args = DocGenerator.parse_command_line()
-
-    if command_line_args.get('config_file'):
-        config_data = DocGenerator.parse_config_file(command_line_args['config_file'])
+    config_fn = command_line_args.get('config_file')
+    if config_fn:
+        config_data = DocGenerator.parse_config_file(config_fn)
     else:
         config_data = {}
 
@@ -1488,6 +1492,42 @@ def main():
     else:
         supfn = os.path.join(cwd, 'usersupplement.md')
 
+    # path of some files will be relative to path of config file:
+    config_dir = os.path.dirname(config_fn)
+
+    # Is there a content supplement file?
+    if config_data.get('content_supplement'):
+        config_supp_fn = config_data['content_supplement']
+        config_supp_fn = os.path.normpath(os.path.join(config_dir, config_supp_fn))
+        try:
+            with open(config_supp_fn, 'r', encoding="utf8") as config_supp_file:
+                supp_config_data = json.load(config_supp_file)
+        except (OSError) as ex:
+            warnings.warn('Unable to open %(filename)s to read: %(message)s' % {'filename':  config_supp_fn, 'message': str(ex)})
+            sys.exit()
+        except (json.decoder.JSONDecodeError) as ex:
+            warnings.warn('%(filename)s appears to be invalid JSON. JSON decoder reports: %(message)s' %
+                              {'filename': config_supp_fn, 'message': str(ex)})
+            sys.exit()
+    else:
+        supp_config_data = {}
+
+    # If boilerplate is specified, read it in now.
+    boilerplate_fns = {'boilerplate_intro': 'intro_content', 'boilerplate_postscript': 'postscript_content'}
+    for fn, content_key in boilerplate_fns.items():
+        if config_data.get(fn):
+            boilerplate_fn = os.path.normpath(os.path.join(config_dir, config_data[fn]))
+            try:
+                with open(boilerplate_fn, 'r', encoding="utf8") as boilerplate_file:
+                    boilerplate_lines = []
+                    for line in boilerplate_file:
+                        line = line.strip('\r\n') # Keep other whitespace
+                        boilerplate_lines.append(line)
+                    config_data[content_key] = '\n'.join(boilerplate_lines)
+            except (OSError) as ex:
+                warnings.warn('Unable to open %(filename)s to read: %(message)s' % {'filename':  config_supp_fn, 'message': str(ex)})
+                sys.exit()
+
     # In property_index mode, the supfile is very simple. Otherwise, it needs to be parsed.
     sup_data = {}
     property_index_boilerplate=None
@@ -1499,7 +1539,7 @@ def main():
             sup_data = DocGenerator.parse_supplemental_data(supfn, supfile_specified=supfile_specified)
 
     config = DocGenerator.combine_configs(command_line_args=command_line_args, config_data=config_data,
-                                 supplemental_data=sup_data)
+                                              supp_config_data=supp_config_data, supplemental_data=sup_data)
 
     if property_index_boilerplate:
         config['property_index_boilerplate'] = property_index_boilerplate

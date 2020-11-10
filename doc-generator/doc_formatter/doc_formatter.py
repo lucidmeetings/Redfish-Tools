@@ -492,12 +492,8 @@ class DocFormatter:
             profile = config.get('profile_resources', {}).get(schema_ref, {})
             self.ref_deduplicator[schema_ref] = {}
 
-            # Look up supplemental details for this schema/version
-            version = details.get('latest_version', '1')
-            major_version = version.split('.')[0]
-            schema_key = schema_name + '_' + major_version
-            supplemental = schema_supplement.get(schema_key,
-                                                 schema_supplement.get(schema_name, {}))
+            version = property_data.get('latest_version', '1')
+            supplemental = self.get_supplemental_details(schema_ref)
 
             json_payload = None
             if self.config.get('payloads'):
@@ -1558,10 +1554,9 @@ class DocFormatter:
         prop_enum = prop_info.get('enum')
         supplemental_details = None
 
-        if 'supplemental' in self.config and 'property details' in self.config['supplemental']:
-            detconfig = self.config['supplemental']['property details']
-            if schema_name in detconfig and prop_name in detconfig[schema_name]:
-                supplemental_details = detconfig[schema_name][prop_name]
+        supplemental = self.get_supplemental_details(schema_ref)
+        if supplemental:
+            supplemental_details = supplemental.get('property_details', {}).get(prop_name)
 
         if prop_enum or supplemental_details:
             has_prop_details = True
@@ -1592,8 +1587,9 @@ class DocFormatter:
         # Action details may be supplied as markdown in the supplemental doc.
         # Possibly we should be phasing this out.
         supplemental_actions = None
-        if 'supplemental' in self.config and 'action details' in self.config['supplemental']:
-            action_config = self.config['supplemental']['action details']
+        supplemental = self.get_supplemental_details(schema_ref)
+        if supplemental and 'action_details' in supplemental:
+            action_config = self.config['supplemental']['action_details']
             action_name = prop_name
             if '.' in action_name:
                 _discard, _discard, action_name = action_name.rpartition('.')
@@ -2173,6 +2169,21 @@ class DocFormatter:
     def get_latest_version(self, schema_ref):
         """ Look up the latest version of the referenced schema in our property data """
         return  self.property_data.get(schema_ref, {}).get('latest_version')
+
+
+    def get_supplemental_details(self, schema_ref):
+        """ Look up supplemental details for this schema/version """
+        supplemental = {}
+        property_data = self.property_data.get(schema_ref)
+        schema_supplement = self.config.get('schema_supplement')
+        if property_data and schema_supplement:
+            schema_name = property_data.get('schema_name')
+            version = property_data.get('latest_version', 1)
+            major_version = version.split('.')[0]
+            schema_key = schema_name + '_' + major_version
+            supplemental = schema_supplement.get(schema_key,
+                                                     schema_supplement.get(schema_name, {}))
+        return supplemental
 
 
     def add_object_close(self, rows, indentation_string, brace_string, num_cols):

@@ -44,5 +44,7 @@
         ]
     },
     "wants_common_objects": true,
+    "boilerplate_intro": "./intro.md",
+    "boilerplate_postscript": "./postscript.md",
     "content_supplement": "./content_supplement.json"
 }
