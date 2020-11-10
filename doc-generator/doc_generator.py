@@ -1245,6 +1245,12 @@ class DocGenerator:
                     config[bp] = bp_content
                     if '[insert_common_objects]' in bp_content:
                         config['wants_common_objects'] = True
+                    if '[add_toc]' in bp_content:
+                        # We always want to set 'add_toc' if there's a placeholder for it in the boilerplate
+                        config['add_toc'] = True
+
+            if not config.get('add_toc'):
+                config['add_toc'] = config_data.get('add_toc', False)
 
             # command-line arguments override the config file.
             config_args = [
@@ -1267,14 +1273,11 @@ class DocGenerator:
                 combined_args['import_from'] = config_data['import_from']
 
             # config_flags don't have command-line overrides; they should be added to config directly.
-            # We want to capture the fact that a flag was set, even if false, as this should override
-            # the corresponding keyword in the supplemental markdown document.
-            # TODO: determine whether this is still needed, with stripped-down supplemental input.
             config_flags = [
-                'add_toc', 'units_translation', 'suppress_version_history',
+                'units_translation', 'suppress_version_history',
                 'actions_in_property_table', 'html_title',
                 'uri_to_local', 'local_to_uri', 'profile_uri_to_local', 'registry_uri_to_local',
-                'combine_multiple_refs'
+                'combine_multiple_refs', 'omit_version_in_headers'
                 ]
             for x in config_flags:
                 if x in config_data:

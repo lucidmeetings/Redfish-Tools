@@ -60,6 +60,7 @@ base_config = {
     }
 
 
+@pytest.mark.skip(reason="Deprecating supplement. Need to review these tests and perhaps replace with others.")
 @patch('urllib.request') # so we don't make HTTP requests. NB: samples should not call for outside resources.
 def test_supplement_output_html (mockRequest):
 
@@ -102,7 +103,7 @@ def test_supplement_output_html (mockRequest):
 
 
 
-
+@pytest.mark.skip(reason="Deprecating supplement. Need to review these tests and perhaps replace with others.")
 @patch('urllib.request') # so we don't make HTTP requests. NB: samples should not call for outside resources.
 def test_supplement_description_vs_full_html (mockRequest):
 
@@ -156,6 +157,7 @@ def test_supplement_description_vs_full_html (mockRequest):
     assert len(ipv6_failed_overrides) == 0, "Property full description override incorrectly included reference to common property " + str(len(ipv6_failed_overrides)) + " mentions of Ipv6Address"
 
 
+@pytest.mark.skip(reason="Deprecating supplement. Need to review these tests and perhaps replace with others.")
 @patch('urllib.request') # so we don't make HTTP requests. NB: samples should not call for outside resources.
 def test_supplement_output_slate (mockRequest):
 
