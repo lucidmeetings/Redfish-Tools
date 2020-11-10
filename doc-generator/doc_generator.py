@@ -22,7 +22,6 @@ import warnings
 import gettext
 from doc_gen_util import DocGenUtilities
 from schema_traverser import SchemaTraverser
-import parse_supplement
 
 
 class InfoWarning(UserWarning):
@@ -1072,10 +1071,6 @@ class DocGenerator:
         parser.add_argument('--out', dest='outfile',
                             help=('Output file (default depends on output format: '
                                   'output.md for Markdown, index.html for HTML, output.csv for CSV'))
-        parser.add_argument('--sup', dest='supfile',
-                            help=('Path to the supplemental material document. '
-                                  'Default is usersupplement.md for user-focused documentation, '
-                                  'and devsupplement.md for normative documentation.'))
         parser.add_argument('--payload_dir', metavar='payload_dir',
                             help=('Directory location for JSON payload and Action examples. Optional.'
                                   'Within this directory, use the following naming scheme for example files: '
@@ -1137,48 +1132,11 @@ class DocGenerator:
 
 
     @staticmethod
-    def parse_supplemental_data(supfn, supfile_specified=False):
-        """ Open and parse supfn. Returns a dictionary.
-        If supfile_specified is False, don't warn if file is not found.
-        """
-
-        supfile_data = {}
-        try:
-            supfile = open(supfn, 'r', encoding="utf8")
-            supfile_data = parse_supplement.parse_file(supfile)
-            supfile.close()
-        except (OSError) as ex:
-            if supfile_specified:
-                warnings.warn('Unable to open %(filename)s to read: %(message)s' % {'filename': supfn, 'message': str(ex)})
-            else:
-                warnings.warn('No supplemental file specified and %(filename)s not found. Proceeding.' % {'filename': supfn})
-        return supfile_data
-
-
-    @staticmethod
-    def parse_supfile_for_property_index(supfn):
-        """ Not really a parser: Open supfn and check that it contains the expected marker.
-        If it does, return the contents of the file. If it doesn't, warn and return None.
-        """
-        try:
-            with open(supfn, 'r', encoding="utf8") as supfile:
-                boilerplate = supfile.read()
-                if '[insert property index]' in boilerplate:
-                    return boilerplate
-                else:
-                    warnings.warn("Supplemental input file lacks the '%(marker)s' marker; ignoring." % {'marker': '[insert property index]'})
-        except (OSError) as ex:
-            warnings.warn('Unable to open %(filename)s to read: %(message)s' % {'filename': supfn,  'message': str(ex)})
-
-        return None
-
-    @staticmethod
-    def combine_configs(command_line_args=None, config_data=None, supp_config_data=None, supplemental_data=None):
+    def combine_configs(command_line_args=None, config_data=None, supp_config_data=None):
         """ Generate configuration based on various inputs (which should be dictionaries):
         command_line_args: command-line arguments
         config_data: read in from a config file
         supp_config_data: read in from content supplement config file
-        supplemental_data: read and parsed from a supplemental markdown document
 
         If a parameter is specified in more than one place, config_data supersedes supplemental_data,
         and command_line_args supersedes all.
@@ -1190,10 +1148,6 @@ class DocGenerator:
             config_data = {}
         if not supp_config_data:
             supp_config_data = {}
-        if not supplemental_data:
-            supplemental_data = {}
-        # FOR DEVELOPMENT/DEBUGGING:
-        supplemental_data = {}
 
         uri_mapping_from_config = config_data.get('uri_to_local')
         registry_uri_mapping_from_config = config_data.get('registry_uri_to_local')
@@ -1201,7 +1155,6 @@ class DocGenerator:
 
         # config will become the combined config dictionary.
         config = {
-            'supplemental': supplemental_data,
             'excluded_annotations': [],
             'excluded_annotations_by_match': [],
             'excluded_properties': [],
@@ -1254,7 +1207,7 @@ class DocGenerator:
 
             # command-line arguments override the config file.
             config_args = [
-                'supfile', 'format', 'outfile', 'payload_dir', 'normative',
+                'format', 'outfile', 'payload_dir', 'normative',
                 'profile_doc', 'subset_doc',
                 'property_index', 'property_index_config_out', 'escape_chars',
                 'locale'
@@ -1392,8 +1345,9 @@ class DocGenerator:
                 if key not in config:
                     config[key] = val
 
-        if 'Schema Documentation' in supplemental_data:
-            config['uri_replacements'] = supplemental_data['Schema Documentation']
+        # TODO: uri_replacements to be renamed to schema_link_replacements, now in content supplement json.
+        # if 'Schema Documentation' in supplemental_data:
+        #     config['uri_replacements'] = supplemental_data['Schema Documentation']
 
 
         excluded_annotations = {}
@@ -1481,20 +1435,6 @@ def main():
     else:
         config_data = {}
 
-    # Is there a supplemental file?
-    supfn = None
-    supfile_specified = False
-    if command_line_args.get('supfile'):
-        supfn = command_line_args['supfile']
-        supfile_specified = True
-    elif config_data.get('supfile'):
-        supfn = config_data['supfile']
-        supfile_specified = True
-    elif command_line_args.get('normative') or config_data.get('normative'):
-        supfn = os.path.join(cwd, 'devsupplement.md')
-    else:
-        supfn = os.path.join(cwd, 'usersupplement.md')
-
     # path of some files will be relative to path of config file:
     config_dir = os.path.dirname(config_fn)
 
@@ -1531,22 +1471,8 @@ def main():
                 warnings.warn('Unable to open %(filename)s to read: %(message)s' % {'filename':  config_supp_fn, 'message': str(ex)})
                 sys.exit()
 
-    # In property_index mode, the supfile is very simple. Otherwise, it needs to be parsed.
-    sup_data = {}
-    property_index_boilerplate=None
-    if command_line_args.get('property_index') or config_data.get('property_index'):
-        if supfn and supfile_specified:
-            property_index_boilerplate = DocGenerator.parse_supfile_for_property_index(supfn)
-    else:
-        if supfn:
-            sup_data = DocGenerator.parse_supplemental_data(supfn, supfile_specified=supfile_specified)
-
     config = DocGenerator.combine_configs(command_line_args=command_line_args, config_data=config_data,
-                                              supp_config_data=supp_config_data, supplemental_data=sup_data)
-
-    if property_index_boilerplate:
-        config['property_index_boilerplate'] = property_index_boilerplate
-
+                                              supp_config_data=supp_config_data)
 
     try:
         outfile = open(config['outfile_name'], 'w', encoding="utf8")

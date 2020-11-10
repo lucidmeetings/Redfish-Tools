@@ -83,7 +83,7 @@ def test_combine_at_3_html(mockRequest):
     config = copy.deepcopy(base_config)
     config['combine_multiple_refs'] = 3
     config['output_format'] = 'html'
-    config['supplemental'] = {'Introduction': "# Common Objects\n\n[insert_common_objects]\n"}
+    config['intro_content'] = "# Common Objects\n\n[insert_common_objects]\n"
 
     input_dir = os.path.abspath(os.path.join(testcase_path, 'sensor'))
 

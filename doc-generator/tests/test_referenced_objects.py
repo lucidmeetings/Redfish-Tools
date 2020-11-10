@@ -62,7 +62,7 @@ def test_identifier_versioning(mockRequest):
 
     config = copy.deepcopy(base_config)
     config['output_format'] = 'html'
-    config['supplemental'] = {'Introduction': "# Common Objects\n\n[insert_common_objects]\n"}
+    config['intro_content'] = "# Common Objects\n\n[insert_common_objects]\n"
 
     input_dir = os.path.abspath(os.path.join(testcase_path, 'ipaddresses'))
 
@@ -82,7 +82,7 @@ def test_markdown_output(mockRequest):
 
     config = copy.deepcopy(base_config)
     config['output_format'] = 'slate'
-    config['supplemental'] = {'Introduction': "# Common Objects\n\n[insert_common_objects]\n"}
+    config['intro_content'] = "# Common Objects\n\n[insert_common_objects]\n"
 
     input_dir = os.path.abspath(os.path.join(testcase_path, 'network_sample'))
     expected_output = open(os.path.join(testcase_path, 'network_sample_output/', 'output.md')).read().strip()
@@ -101,7 +101,7 @@ def test_html_output(mockRequest):
 
     config = copy.deepcopy(base_config)
     config['output_format'] = 'html'
-    config['supplemental'] = {'Introduction': "# Common Objects\n\n[insert_common_objects]\n"}
+    config['intro_content'] = "# Common Objects\n\n[insert_common_objects]\n"
 
     input_dir = os.path.abspath(os.path.join(testcase_path, 'network_sample'))
     expected_output = open(os.path.join(testcase_path, 'network_sample_output/', 'index.html')).read().strip()

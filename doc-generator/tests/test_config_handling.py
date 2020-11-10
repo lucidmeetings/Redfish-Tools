@@ -93,7 +93,6 @@ def test_config_keys():
         "profile_resources",
         "profile_uri_to_local",
         "schema_supplement",
-        "supplemental",
         "units_translation",
         "uri_replacements",
         "uri_to_local",
@@ -181,7 +180,7 @@ def test_cli_overrides_config(mock_exit):
     cfg = base_cfg_in.copy()
     supp = base_supp.copy()
 
-    config = DocGenerator.combine_configs(command_line_args=cli_args, config_data=cfg, supplemental_data=supp)
+    config = DocGenerator.combine_configs(command_line_args=cli_args, config_data=cfg)
 
     assert config.get('import_from') == ['/cli/path/to/schemas']
     assert config.get('outfile_name') == 'cli_outfile_name.md'

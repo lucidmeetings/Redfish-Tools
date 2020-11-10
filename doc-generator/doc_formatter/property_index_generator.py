@@ -68,10 +68,8 @@ class PropertyIndexGenerator(DocFormatter):
         self.coalesce_properties()
         output_format = self.config.get('output_format', 'slate')
         output = ''
-        frontmatter = backmatter = ''
-        if 'property_index_boilerplate' in self.config:
-            boilerplate = self.config['property_index_boilerplate']
-            frontmatter, backmatter = boilerplate.split('[insert property index]')
+        frontmatter = self.config.get('intro_content', '')
+        backmatter = self.config.get('postscript_content', '')
         if output_format == 'html':
             if frontmatter:
                 output = self.formatter.markdown_to_html(frontmatter)

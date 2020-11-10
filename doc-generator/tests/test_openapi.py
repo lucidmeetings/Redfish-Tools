@@ -116,7 +116,7 @@ def test_uris_in_collection_schema_slate_output (mockRequest):
     config = copy.deepcopy(base_config)
     config['excluded_schemas_by_match'] = [ 'Collection' ]
     config['output_format'] = 'slate'
-    config['supplemental'] = {'Introduction': "# Redfish Collections\n\n[insert_collections]\n"}
+    config['intro_content'] = "# Redfish Collections\n\n[insert_collections]\n"
 
     input_dir = os.path.abspath(os.path.join(testcase_path, 'input'))
 

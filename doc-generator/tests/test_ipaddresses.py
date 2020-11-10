@@ -35,7 +35,7 @@ def test_ipaddresses (mockRequest):
     config = copy.deepcopy(base_config)
     config['output_format'] = 'html'
     # The following is needed only if we want to inspect the output:
-    config['supplemental'] = { 'Introduction': "# Common Objects\n\n[insert_common_objects]\n" }
+    config['intro_content'] = "# Common Objects\n\n[insert_common_objects]\n"
 
     input_dir = os.path.abspath(os.path.join(testcase_path, 'ipaddresses'))
 
