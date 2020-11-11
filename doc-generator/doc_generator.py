@@ -1170,7 +1170,7 @@ class DocGenerator:
             'normative': False,
             'escape_chars': [],
             'cwd': cwd,
-            'uri_replacements': {},
+            'schema_link_replacements': {},
             'local_to_uri': {},
             'uri_to_local': {},
             'registry_uri_to_local': {},
@@ -1336,19 +1336,9 @@ class DocGenerator:
                               InfoWarning)
             sys.exit()
 
-        if 'units_translation' in supp_config_data:
-            config['units_translation'] = supp_config_data['units_translation']
-
-        if 'keywords' in supp_config_data:
-            # Promote the keywords to top-level keys.
-            for key, val in supp_config_data['keywords'].items():
-                if key not in config:
-                    config[key] = val
-
-        # TODO: uri_replacements to be renamed to schema_link_replacements, now in content supplement json.
-        # if 'Schema Documentation' in supplemental_data:
-        #     config['uri_replacements'] = supplemental_data['Schema Documentation']
-
+        for kw in ['units_translation', 'schema_link_replacements']:
+            if kw in supp_config_data:
+                config[kw] = supp_config_data[kw]
 
         excluded_annotations = {}
         if 'excluded_annotations' in config_data:

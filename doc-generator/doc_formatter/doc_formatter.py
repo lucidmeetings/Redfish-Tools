@@ -81,8 +81,8 @@ class DocFormatter:
                 self.documented_schemas.append(schema_ref)
 
         self.uri_match_keys = None
-        if self.config.get('uri_replacements'):
-            map_keys = list(self.config['uri_replacements'].keys())
+        if self.config.get('schema_link_replacements'):
+            map_keys = list(self.config['schema_link_replacements'].keys())
             map_keys.sort(key=len, reverse=True)
             self.uri_match_keys = map_keys
 
@@ -1963,7 +1963,7 @@ class DocFormatter:
         return text
 
     def get_documentation_uri(self, ref_uri):
-        """ If ref_uri is matched in self.config['uri_replacements'], provide a reference to that """
+        """ If ref_uri is matched in self.config['schema_link_replacements'], provide a reference to that """
 
         if not self.uri_match_keys:
             return None
@@ -1971,7 +1971,7 @@ class DocFormatter:
         replacement = None
         for key in self.uri_match_keys:
             if key in ref_uri:
-                match_list = self.config['uri_replacements'][key]
+                match_list = self.config['schema_link_replacements'][key]
                 for match_spec in match_list:
                     if match_spec.get('full_match') and match_spec['full_match'] == ref_uri:
                         replacement = match_spec.get('replace_with')

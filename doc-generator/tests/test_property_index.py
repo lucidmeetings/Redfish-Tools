@@ -34,7 +34,7 @@ base_config = {
         "@odata.etag",
         "*@odata.count",
         ],
-    'uri_replacements': {},
+    'schema_link_replacements': {},
     'property_description_overrides': {},
     'supplemental': {},
 

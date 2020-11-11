@@ -31,10 +31,6 @@ schema_supplement = {
     },
     }
 
-supplemental = {
-    'Introduction': "# Common Objects\n\n[insert_common_objects]\n\ntext1\n~pagebreak~\ntext2\n"
-    }
-
 property_description_overrides = {
     "Oem": "This is a description override for the Oem object."
     }
@@ -50,17 +46,16 @@ base_config = {
     'excluded_annotations_by_match': ['@odata.count', '@odata.navigationLink'],
     'excluded_schemas': [],
     'excluded_properties': ['@odata.id', '@odata.context', '@odata.type'],
-    'uri_replacements': {},
+    'schema_link_replacements': {},
     'wants_common_objects': True,
     'profile': {},
     'escape_chars': [],
     'schema_supplement': schema_supplement,
     'property_description_overrides': property_description_overrides,
-    'supplemental': supplemental,
+    'intro_content': "# Common Objects\n\n[insert_common_objects]\n\ntext1\n~pagebreak~\ntext2\n",
     }
 
 
-@pytest.mark.skip(reason="Deprecating supplement. Need to review these tests and perhaps replace with others.")
 @patch('urllib.request') # so we don't make HTTP requests. NB: samples should not call for outside resources.
 def test_supplement_output_html (mockRequest):
 
@@ -102,8 +97,6 @@ def test_supplement_output_html (mockRequest):
     assert '<p style="page-break-before: always"></p>' in pbrk_location, "HTML output lacked expected page break markup"
 
 
-
-@pytest.mark.skip(reason="Deprecating supplement. Need to review these tests and perhaps replace with others.")
 @patch('urllib.request') # so we don't make HTTP requests. NB: samples should not call for outside resources.
 def test_supplement_description_vs_full_html (mockRequest):
 
@@ -157,7 +150,6 @@ def test_supplement_description_vs_full_html (mockRequest):
     assert len(ipv6_failed_overrides) == 0, "Property full description override incorrectly included reference to common property " + str(len(ipv6_failed_overrides)) + " mentions of Ipv6Address"
 
 
-@pytest.mark.skip(reason="Deprecating supplement. Need to review these tests and perhaps replace with others.")
 @patch('urllib.request') # so we don't make HTTP requests. NB: samples should not call for outside resources.
 def test_supplement_output_slate (mockRequest):
 

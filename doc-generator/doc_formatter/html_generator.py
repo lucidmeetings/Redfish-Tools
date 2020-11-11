@@ -912,7 +912,7 @@ pre.code{
             'excluded_schemas': [],
             'excluded_schemas_by_match': [],
             'escape_chars': [],
-            'uri_replacements': {},
+            'schema_link_replacements': {},
             'units_translation': self.config.get('units_translation'),
             'profile': self.config.get('profile'),
             'profile_mode': self.config.get('profile_mode'),

@@ -7,8 +7,8 @@ File: test_config_handling.py
 
 Brief: test(s) for correct handling of config options from multiple sources
 
-Users can specify parameters on the command line, in a config file (JSON formatted), and in a supplemental file
-(which is a markdown file and must be parsed). These tests validate that parameters are correctly
+Users can specify parameters on the command line, and in two json-formatted config files.
+These tests validate that parameters are correctly
 combined into a single config dictionary, and for parameters that are specified in more than one place,
 the command line takes precedence, followed by the config file and finally the supplemental file.
 """
@@ -25,7 +25,6 @@ base_cli_args = {
     "normative": True,
     "format": 'markdown',
     "outfile": "cli_outfile_name.md",
-    "supfile": "/cli/path/to/base_supp_file",
     "payload_dir": "/cli/path/to/payloads",
     "profile_doc": None,
     "profile_terse": False,
@@ -51,13 +50,6 @@ base_cfg_in = {
     "units_translation": {
         "s": "s_from_cfg",
         "Mb/s": "Mb/s_from_cfg",
-    }
-}
-
-base_supp = {
-    "keywords": {
-        "html_title": "Title from the supplemental doc",
-        "actions_in_property_table": False
     }
 }
 
@@ -94,7 +86,7 @@ def test_config_keys():
         "profile_uri_to_local",
         "schema_supplement",
         "units_translation",
-        "uri_replacements",
+        "schema_link_replacements",
         "uri_to_local",
         "wants_common_objects",
     ]
@@ -178,7 +170,6 @@ def test_cli_overrides_config(mock_exit):
 
     cli_args = base_cli_args.copy()
     cfg = base_cfg_in.copy()
-    supp = base_supp.copy()
 
     config = DocGenerator.combine_configs(command_line_args=cli_args, config_data=cfg)
 
