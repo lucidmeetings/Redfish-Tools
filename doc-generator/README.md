@@ -26,6 +26,20 @@ The default output is GitHub-flavored Markdown targeted for the [Slate API docs 
     % pip install -r requirements.txt
     ```
 
+1. If you are making changes to this code, please also install pytest and run the tests. Installation via `pip`:
+
+    ```
+    % cd doc-generator
+    % pip install -r dev_requirements.txt
+    ```
+
+To run the tests, simply:
+
+    ```
+    % cd doc-generator
+    % pytest
+    ```
+
 ## Usage
 
 By default, `doc_generator.py` looks for a `json-schema` directory and
