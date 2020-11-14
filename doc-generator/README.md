@@ -33,7 +33,7 @@ The default output is GitHub-flavored Markdown targeted for the [Slate API docs 
     % pip install -r dev_requirements.txt
     ```
 
-To run the tests, simply:
+    To run the tests, simply:
 
     ```
     % cd doc-generator
