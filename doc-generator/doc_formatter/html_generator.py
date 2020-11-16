@@ -805,7 +805,6 @@ pre.code{
     def output_document(self):
         """Return full contents of document"""
 
-        supplemental = self.config.get('supplemental', {})
         body = ''
 
         intro = self.config.get('intro_content')
@@ -829,7 +828,7 @@ pre.code{
             body = body.replace(marker, common_properties, 1)
         else:
             if common_properties:
-                warnings.warn('Supplemental file lacks "[insert_common_objects]" marker. Common object properties were found but will be omitted.')
+                warnings.warn('Boilerplate lacks "[insert_common_objects]" marker. Common object properties were found but will be omitted.')
 
 
         marker = False
@@ -851,9 +850,7 @@ pre.code{
         # Replace pagebreak markers with pagebreak markup
         body = body.replace('~pagebreak~', '<p style="page-break-before: always"></p>')
 
-        doc_title = self.config.get('html_title', supplemental.get('Title'))
-        if not doc_title:
-            doc_title = ''
+        doc_title = self.config.get('html_title', '')
 
         headlines = ['<head>', '<meta charset="utf-8"/>', '<title>' + doc_title + '</title>']
         styles = self.css_content
@@ -904,7 +901,6 @@ pre.code{
             'normative': self.config.get('normative'),
             'cwd': self.config.get('cwd'),
             'schema_supplement': {},
-            'supplemental': {},
             'excluded_annotations': [],
             'excluded_annotations_by_match': [],
             'excluded_properties': [],

@@ -36,7 +36,6 @@ base_config = {
         ],
     'schema_link_replacements': {},
     'property_description_overrides': {},
-    'supplemental': {},
 
     'profile': {},
     'escape_chars': [],
