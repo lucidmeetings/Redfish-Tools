@@ -1162,6 +1162,7 @@ class DocGenerator:
             'excluded_schemas': [],
             'excluded_schemas_by_match': [],
             'excluded_pattern_props': [],
+            'description_overrides': {},
             'property_description_overrides': {},
             'property_fulldescription_overrides': {},
             'wants_common_objects': False,
@@ -1230,7 +1231,8 @@ class DocGenerator:
                 'units_translation', 'suppress_version_history',
                 'actions_in_property_table', 'html_title',
                 'uri_to_local', 'local_to_uri', 'profile_uri_to_local', 'registry_uri_to_local',
-                'combine_multiple_refs', 'omit_version_in_headers'
+                'combine_multiple_refs', 'omit_version_in_headers',
+                'description_overrides' # this is for property_index mode only
                 ]
             for x in config_flags:
                 if x in config_data:
