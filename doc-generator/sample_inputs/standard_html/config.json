@@ -1,10 +1,10 @@
 {
     "version": "The version string is optional. It may have (future?) meaning in property index mode.",
     "description": "Redfish Documentation Generator Example: config file for output of standard-mode documentation in HTML format.",
+    "uri_mapping": { "redfish.dmtf.org/schemas/v1": "./json-schema" },
     "format": "html",
     "import_from": [ "./json-schema" ],
     "outfile": "standard.html",
-    "uri_mapping": { "redfish.dmtf.org/schemas/v1": "./json-schema" },
     "payload_dir": "./mockups/DSP2046-examples",
     "add_toc": true,
     "html_title": "Sample Standard Output",
@@ -42,7 +42,6 @@
             "http://redfish.dmtf.org/schemas/v1/PCIeDevice.json#/definitions/PCIeInterface"
         ]
     },
-    "wants_common_objects": true,
     "boilerplate_intro": "./intro.md",
     "boilerplate_postscript": "./postscript.md",
     "content_supplement": "./content_supplement.json"
