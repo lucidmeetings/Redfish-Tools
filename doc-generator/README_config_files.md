@@ -6,9 +6,9 @@ If an option is specified in more than one way, command-line arguments override 
 
 Config files must be valid JSON.
 
-The Base Configuration file is a JSON file that can specify most of the options available for the doc generator, including the command-line options. This file is also where you will specify the location of other configuration files, including the Content Supplement and boilerplate (intro and postscript) files.
+The [Base Configuration file](#base-configuration-file-supported-attributes) is a JSON file that can specify most of the options available for the doc generator, including the command-line options. This file is also where you will specify the location of other configuration files, including the Content Supplement and boilerplate (intro and postscript) files.
 
-The Content Supplement file is a JSON file that contains text replacements and additions to be applied to the generated schema documentation. It includes text overrides for property descriptions, units translation (replacements for unit abbreviations), and schema-specific content including intros, postscripts, and property description substitutions.
+The [Content Supplement file](#content-supplement-config-file-supported-attributes) is a JSON file that contains text replacements and additions to be applied to the generated schema documentation. It includes text overrides for property descriptions, units translation (replacements for unit abbreviations), and schema-specific content including intros, postscripts, and property description substitutions.
 
 
 ## Base Configuration file: Supported Attributes
