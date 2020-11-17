@@ -68,3 +68,5 @@ The content supplement contains text replacements and insertions:
  - `units_translation`: replacements for the units abbreviations used in the schema files.
  - `schema_supplement`: schema-specific intros, postscripts, and property description overrides
  - `schema_link_replacements`: mapping of URIs found in schemas to URIs to substitute. Used to replace links to external refs in documentation.
+ - `property_description_overrides`: replacements for individual property descriptions, by property name
+ - `property_fulldescription_overrides`: replacements for individual property descriptions, by property name. These overrides also eliminate any auto-generated explanations, like references to the definition of a property in another schema.

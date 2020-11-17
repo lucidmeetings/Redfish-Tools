@@ -1392,7 +1392,8 @@ class DocGenerator:
                                         'Output is likely to be incomplete.',
                                         "\n\n"]))
 
-        config['schema_supplement'] = supp_config_data.get('schema_supplement', {})
+        if 'schema_supplement' in supp_config_data:
+            config['schema_supplement'] = self.parse_schema_supplement(supp_config_data.get('schema_supplement'))
 
         config['normative'] = combined_args.get('normative', False)
 
@@ -1413,6 +1414,42 @@ class DocGenerator:
             config['locale'] = combined_args['locale']
 
         return config
+
+
+def parse_schema_supplement(supp_data):
+    """ Vet and extend supp_data. Any "mockup" entries in supp_data should be file paths or URIs to be expanded. """
+    for schema_name, data in supp_data.items():
+        if 'mockup' in data:
+            mockup_location = data.get('mockup')
+            mockup = None
+            ml_lower = mockup_location.lower()
+            if ml_lower.startswith('http://') or ml_lower.startswith('https://'):
+                # retrieve it via http[s]
+                try:
+                    response = urllib.request.urlopen(mockup_location)
+                    if 200 <= response.status < 300:
+                        mockup = response.read().decode('utf-8') # JSON is UTF-8 by spec.
+                    else:
+                        warnings.warn('Unable to retrieve Mockup from URL "%(uri)s": Server returned %(status_code)s status' %
+                                          {'uri': mockup_location, 'status_code': response.status})
+                except Exception as ex:
+                    warnings.warn('Unable to retrieve Mockup from URL "%(uri)s": %(ex)s' % {'uri': mockup_location, 'ex': str(ex)})
+                else:
+                    # treat it as a local file
+                    try:
+                        mockup_file = open(mockup_location, 'r', encoding="utf8")
+                        mockup = mockup_file.read()
+                    except Exception as ex:
+                        warnings.warn('Unable to open Mockup file "%(uri)s" to read: %(ex)s'
+                                              % {'uri': mockup_location, 'ex': str(ex)})
+
+            if mockup:
+                if data.get('jsonpayload'):
+                    warnings.warn('Warning: Mockup and JSONPayload both specified; using Mockup %(uri)s'
+                                      % {'uri': mockup_location})
+                data['jsonpayload'] = mockup
+
+    return supp_data
 
 
 def main():

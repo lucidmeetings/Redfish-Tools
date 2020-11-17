@@ -6,7 +6,12 @@ If an option is specified in more than one way, command-line arguments override 
 
 Config files must be valid JSON.
 
-## Supported Attributes
+The Base Configuration file is a JSON file that can specify most of the options available for the doc generator, including the command-line options. This file is also where you will specify the location of other configuration files, including the Content Supplement and boilerplate (intro and postscript) files.
+
+The Content Supplement file is a JSON file that contains text replacements and additions to be applied to the generated schema documentation. It includes text overrides for property descriptions, units translation (replacements for unit abbreviations), and schema-specific content including intros, postscripts, and property description substitutions.
+
+
+## Base Configuration file: Supported Attributes
 
 Note that the names of some config keys differ from their command-line counterparts, as noted. Unless otherwise noted, the meaning of the parameter is the same as its command-line counterpart. The `uri_mapping` attribute is expected. All other attributes are optional in config files.
 
@@ -75,6 +80,65 @@ The payload_dir attribute specifies a directory location for JSON payload and Ac
 #### profile_terse
 
 The profile_terse attribute is meaningful only when a profile document is also specified. When true, "terse" output will be produced. By default, profile output is verbose and includes all properties regardless of profile requirements. "Terse" output is intended for use by Service developers, including only the subset of properties with profile requirements.
+
+
+## Content Supplement Config file: Supported Attributes
+
+- property_description_overrides: a dictionary mapping property names to strings to use to replace the descripions of the named properties.
+- property_fulldescription_overrides: a dictionary just like property_description_overrides. These replacements are "full" in that any additional information the doc generator would normally append, like a reference to the definition of the property in another schema, will be omitted.
+- schema_link_replacements: a dictionary mapping URIs of schema references to a structure specifying match type (full or partial) and replacement URIs. This can be used to substitute a link to documentation where a link to a specific schema would otherwise appear in the documentation. See below for details.
+- schema_supplement: a dictionary mapping schema names to a dictionary of structured content, including introductory text and schema-specific text replacements. See below for details.
+- units_translation: a dictionary mapping units as they appear in Redfish schemas to units as you want them to appear in the documentation.
+
+### In More Detail
+
+#### schema_link_replacements
+
+The schema_link_replacements attribute defines a dictionary mapping URIs of schema references to replacement URIs. This can be used to substitute a link to documentation where a link to a specific schema would otherwise appear in the documentation. The structure of this dictionary is:
+
+```json
+
+    "schema_link_replacements": {
+        "https://somewhere.example.com/some/path/to/a/some_schema.json": {
+            "full_match": true,
+            "replace_with": "https://docserver.example.org/some_schema_doc.html"
+        },
+        "fancy": {
+            "full_match": false,
+            "replace_with": "https://docserver.example.org/fancy_schemas.html"
+        }
+    }
+```
+
+#### schema_supplement
+
+The schema_supplement attribute defines a dictionary of structured content, including text overrides for property descriptions, units translation (replacements for unit abbreviations), schema-specific intros, property description substitutions, and other supplementary data. The structure of this object looks like this (all fields are optional):
+
+```json
+    "schema_supplement": {
+        "SchemaName": {
+            "description": "A string to replace the schema description. Plain text or markdown.",
+            "mockup": "A path or URI to a mockup file.",
+            "jsonpayload": "A chunk of JSON.",
+            "intro": "",
+            "property_description_overrides": {
+		"PropertyName": "a string, plain text or markdown.",
+		"AnotherPropertyName": "a string, plain text or markdown."
+            },
+            "property_fulldescription_overrides": {
+		"YetAnotherPropertyName": "a string, plain text or markdown. This string will also eliminate any additional data the doc generator would normally append to the description."
+            },
+            "property_details": {
+                "EnumPropertyName": "A string, plain text or markdown. This will be inserted after the property description and prior to the table of enum details in the property information under Property Details."
+            }
+	}
+```
+
+Here, "SchemaName" may be a bare schema name, or it may be a schema name with an underscore and major version appended; e.g., "ComputerSystem" or "ComputerSystem_2".
+
+If `description` or `intro` are specified for a schema, that value will replace the description of the schema. If both are specified, the `description` will be output, followed by the `intro`.
+
+The `mockup` and `jsonpayload` attributes are mutually exclusive. If both are provided, the content found at `mockup` will take precedence. Using a payload directory (specified as `payload_dir` in the Base Configuration file) is preferred over using these attributes.
 
 ## Examples
 

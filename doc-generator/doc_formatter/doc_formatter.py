@@ -533,16 +533,16 @@ class DocFormatter:
             required_on_create = definitions[schema_name].get('requiredOnCreate', [])
 
             # Override with supplemental schema description, if provided
-            # If there is a supplemental Description or Schema-Intro, it replaces
-            # the description in the schema. If both are present, the Description
-            # should be output, followed by the Schema-Intro.
-            if supplemental.get('description') and supplemental.get('schema-intro'):
+            # If there is a supplemental "description" or "intro", it replaces
+            # the description in the schema. If both are present, the "description"
+            # should be output, followed by the "intro".
+            if supplemental.get('description') and supplemental.get('intro'):
                 description = (supplemental.get('description') + '\n\n' +
-                               supplemental.get('schema-intro'))
+                               supplemental.get('intro'))
             elif supplemental.get('description'):
                 description = supplemental.get('description')
             else:
-                description = supplemental.get('schema-intro', description)
+                description = supplemental.get('intro', description)
 
             # Profile purpose overrides all:
             if profile and profile_mode != 'subset':
@@ -752,18 +752,18 @@ class DocFormatter:
                 cp_gen.add_json_payload(supplemental.get('jsonpayload'))
 
                 # Override with supplemental schema description, if provided
-                # If there is a supplemental Description or Schema-Intro, it replaces
-                # the description in the schema. If both are present, the Description
-                # should be output, followed by the Schema-Intro.
+                # If there is a supplemental "description" or "intro", it replaces
+                # the description in the schema. If both are present, the "description"
+                # should be output, followed by the "intro".
                 description = self.get_property_description(prop_info)
 
-                if supplemental.get('description') and supplemental.get('schema-intro'):
+                if supplemental.get('description') and supplemental.get('intro'):
                     description = (supplemental.get('description') + '\n\n' +
-                                   supplemental.get('schema-intro'))
+                                   supplemental.get('intro'))
                 elif supplemental.get('description'):
                     description = supplemental.get('description')
                 else:
-                    description = supplemental.get('schema-intro', description)
+                    description = supplemental.get('intro', description)
 
                 if description:
                     cp_gen.add_description(description)
@@ -1584,25 +1584,6 @@ class DocFormatter:
                 'formatted_descr': formatted_details
                 }
 
-        # Action details may be supplied as markdown in the supplemental doc.
-        # Possibly we should be phasing this out.
-        supplemental_actions = None
-        supplemental = self.get_supplemental_details(schema_ref)
-        if supplemental and 'action_details' in supplemental:
-            action_config = self.config['supplemental']['action_details']
-            action_name = prop_name
-            if '.' in action_name:
-                _discard, _discard, action_name = action_name.rpartition('.')
-            if action_config.get(schema_name) and action_name in action_config[schema_name].keys():
-                supplemental_actions = action_config[schema_name][action_name]
-                supplemental_actions['action_name'] = action_name
-
-        if supplemental_actions:
-            has_prop_actions = True
-            formatted_actions = self.format_action_details(prop_name, supplemental_actions)
-            action_details = supplemental_actions
-            self.add_action_details(formatted_actions)
-
         # embedded object:
         if prop_is_object:
             new_path = prop_path.copy()
@@ -1971,14 +1952,13 @@ class DocFormatter:
         replacement = None
         for key in self.uri_match_keys:
             if key in ref_uri:
-                match_list = self.config['schema_link_replacements'][key]
-                for match_spec in match_list:
-                    if match_spec.get('full_match') and match_spec['full_match'] == ref_uri:
-                        replacement = match_spec.get('replace_with')
-                    elif match_spec.get('wild_match'):
-                        pattern = '.*' + ''.join(match_spec['wild_match']) + '.*'
-                        if re.search(pattern, ref_uri):
-                            replacement = match_spec.get('replace_with')
+                match_spec = self.config['schema_link_replacements'][key]
+                if match_spec.get('full_match') and match_spec['full_match'] == ref_uri:
+                    preplacement = match_spec.get('replace_with')
+                    return replacement
+                elif not match_spec.get('full_match'):
+                    replacement = match_spec.get('replace_with')
+                    return replacement
 
         return replacement
 
@@ -2105,8 +2085,8 @@ class DocFormatter:
         if not prop_name:
             prop_name = prop_info.get('_prop_name')
 
-        local_overrides = self.config.get('schema_supplement', {}).get(schema_name, {}).get('description overrides', {})
-        local_full_overrides = self.config.get('schema_supplement', {}).get(schema_name, {}).get('fulldescription overrides', {})
+        local_overrides = self.config.get('schema_supplement', {}).get(schema_name, {}).get('property_description_overrides', {})
+        local_full_overrides = self.config.get('schema_supplement', {}).get(schema_name, {}).get('property_fulldescription_overrides', {})
         prop_info['fulldescription_override'] = False
 
         if (prop_name in local_overrides) or (prop_name in local_full_overrides):

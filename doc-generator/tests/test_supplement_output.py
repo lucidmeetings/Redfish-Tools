@@ -20,13 +20,13 @@ schema_supplement = {
     # Status is an example of a Referenced Object.
     'Status': {
     'description': "SUPPLEMENT-SUPPLIED DESCRIPTION for Status",
-    'schema-intro': "SUPPLEMENT-SUPPLIED INTRO for Status",
+    'intro': "SUPPLEMENT-SUPPLIED INTRO for Status",
     'jsonpayload': "SUPPLEMENT-SUPPLIED JSON for Status",
     },
     # Endpoint is a documented schema
     'Endpoint': {
     'description': "SUPPLEMENT-SUPPLIED DESCRIPTION for Endpoint",
-    'schema-intro': "SUPPLEMENT-SUPPLIED INTRO for Endpoint",
+    'intro': "SUPPLEMENT-SUPPLIED INTRO for Endpoint",
     'jsonpayload': "SUPPLEMENT-SUPPLIED JSON for Endpoint",
     },
     }
