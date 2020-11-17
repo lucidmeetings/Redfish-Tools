@@ -110,7 +110,7 @@ Example:
    doc_generator.py --format=html --out=/path/to/output/index.html /path/to/spmf/json-files
 ```
 
-Refer to README_Property_Index.md for documentation on Property Index mode.
+Refer to [Property Index Mode](README_Property_Index.md) for documentation on Property Index mode.
 
 Normative output prefers long descriptions to descriptions.
 

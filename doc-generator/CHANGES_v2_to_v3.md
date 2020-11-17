@@ -57,8 +57,8 @@ Move these fields out of the base config.json and into the content supplement:
 
 Two field names, recognized only in "Property Index" mode and specified in config.json, have been renamed:
 
- - `ExcludedProperties` is now `excluded_properties` (same as is used in other modes)
- - `DescriptionOverrides` is now `property_description_overrides` (same as used in other modes, but in Property Index mode the individual overrides have additional fields)
+ - `ExcludedProperties` is now `excluded_properties` (as in other modes)
+ - `DescriptionOverrides` is now `description_overrides`. Note that this is distinct from the `property_description_overrides` used in the content supplement for other modes, and is provided in the base config rather than the content supplement.
 
 
 ## The Content Supplement JSON File
