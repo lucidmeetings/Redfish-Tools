@@ -302,7 +302,7 @@ class DocFormatter:
         raise NotImplementedError
 
 
-    def format_action_parameters(self, schema_ref, prop_name, prop_descr, action_parameters, profile):
+    def format_action_parameters(self, schema_ref, prop_name, prop_descr, action_parameters, profile, version_strings=None):
         """Generate a formatted Actions section from parameters data"""
         raise NotImplementedError
 
@@ -2176,8 +2176,8 @@ class DocFormatter:
 
 
     def escape_text(self, text, chars=None):
-        """Escape text in whatever way is appropriate to this output format. """
-        raise NotImplementedError
+        """Escape text in whatever way is appropriate to this output format. Default is not to escape. """
+        return text
 
 
     @staticmethod

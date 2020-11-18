@@ -153,39 +153,31 @@ Note that the config files themselves contain references to other files in this 
 
  python ../Redfish-Tools/doc-generator/doc_generator.py --config=../Redfish-Tools/doc-generator/sample_inputs/standard_html/config.json
 
-# TODO: UPDATE THE BELOW
-
-Config file references supplemental file *supplement_for_standard_output.md*
+Note that the "object_reference_disposition" part of this config identifies specific behavior for the Redundancy resource and for PCIeInterface (defined in PCIeDevice).
 
 ### Produce full documentation, with normative descriptions and in HTML format:
 
- python ../Redfish-Tools/doc-generator/doc_generator.py --config=../Redfish-Tools/doc-generator/sample_inputs/config_for_normative_html.json
-
-Config file references supplemental file *supplement_for_standard_output.md*
-
-Note that the "object_reference_disposition" part of this config identifies specific behavior for the Redundancy resource and for PCIeInterface (defined in PCIeDevice).
+ python ../Redfish-Tools/doc-generator/doc_generator.py --config=../Redfish-Tools/doc-generator/sample_inputs/standard_html/config_normative.json
 
 ### Produce Profile output (terse mode, markdown format):
 
-  python ../Redfish-Tools/doc-generator/doc_generator.py --config=../Redfish-Tools/doc-generator/sample_inputs/config_for_profile_terse.json
+  python ../Redfish-Tools/doc-generator/doc_generator.py --config=../Redfish-Tools/doc-generator/sample_inputs/profile_mode/config.json
 
-Config file references supplemental file *SampleProfileInput.md* and the profile OCPBasicServer.v1_0_0.json (which in turn references OCPManagedDevice.v1_0_0.json).
+Config file references the profile OCPBasicServer.v1_0_0.json (which in turn references OCPManagedDevice.v1_0_0.json).
 
 ### Produce Subset documentation (HTML format):
 
-  python ../Redfish-Tools/doc-generator/doc_generator.py --config=../Redfish-Tools/doc-generator/sample_inputs/config_for_subset.json
+  python ../Redfish-Tools/doc-generator/doc_generator.py --config=../Redfish-Tools/doc-generator/sample_inputs/subset/config.json
 
-Config file references supplemental file *SampleProfileInput.md* and the profile OCPBasicServer.v1_0_0.json (which in turn references OCPManagedDevice.v1_0_0.json).
+Config file references the profile OCPBasicServer.v1_0_0.json (which in turn references OCPManagedDevice.v1_0_0.json).
 
 
 ### Produce Property Index output (HTML format):
 
-  python ../Redfish-Tools/doc-generator/doc_generator.py --config=../Redfish-Tools/doc-generator/sample_inputs/config_for_property_index.json
+  python ../Redfish-Tools/doc-generator/doc_generator.py --config=../Redfish-Tools/doc-generator/sample_inputs/property_index/config.json
 
-Note that the config file for property index output includes some elements that are specific to that mode: DescriptionOverrides. Property Index mode does not use a supplemental markdown document.
+Note that the Base Configuration file for property index output includes some elements that are specific to that mode: description_overrides.
 
 ### Produce CSV output:
 
- python ../Redfish-Tools/doc-generator/doc_generator.py --config=../Redfish-Tools/doc-generator/sample_inputs/config_for_csv.json
-
-Config file references supplemental file *supplement_for_standard_output.md*. (Note that there's a lot of detail in this supplemental file that's irrelevant to CSV output, and is simply ignored.)
+ python ../Redfish-Tools/doc-generator/doc_generator.py --config=../Redfish-Tools/doc-generator/sample_inputs/csv/config.json

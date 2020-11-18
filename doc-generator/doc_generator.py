@@ -268,6 +268,7 @@ class DocGenerator:
                     req_profile_repo = local_path[0:-len(req_profile_name)]
                 else:
                     req_profile_repo = local_path
+                req_profile_repo = os.path.abspath(req_profile_repo)
                 is_local_file = True
                 break
 
@@ -1393,7 +1394,7 @@ class DocGenerator:
                                         "\n\n"]))
 
         if 'schema_supplement' in supp_config_data:
-            config['schema_supplement'] = self.parse_schema_supplement(supp_config_data.get('schema_supplement'))
+            config['schema_supplement'] = parse_schema_supplement(supp_config_data.get('schema_supplement'))
 
         config['normative'] = combined_args.get('normative', False)
 
