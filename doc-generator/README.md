@@ -2,6 +2,8 @@
 
 Copyright 2016-2020 Distributed Management Task Force, Inc. All rights reserved.
 
+Version 3 introduces breaking changes to how you configure this tool. See [Changes in Doc Generator V3](CHANGES_v2_to_v3.md) for guidance on how to restructure your existing configuration files. The README files have also been updated. A snapshot of the "version 2" code is available as the "Doc Generator v2" release.
+
 ## About
 
 The `doc_generator.py` is a Python tool that parses a set of JSON schema files (typically the entire set for a version) and generates a formatted documentation.
